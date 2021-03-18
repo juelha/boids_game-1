@@ -25,6 +25,8 @@ public class Boid : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // init velocity
+        // the reason why one cube is going 0/0/2
         velocity = this.transform.forward * maxVelocity; // start at max speed 
     }
 

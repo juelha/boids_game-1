@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7697071343886544119}
   - component: {fileID: 7697071343886544116}
   - component: {fileID: 7697071343886544117}
+  - component: {fileID: 2021936908615548318}
   m_Layer: 0
   m_Name: Boid
   m_TagString: Untagged
@@ -137,5 +138,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51fdbf918c3bc484398bf5e7ab0f6e8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 2
-  repulsionForce: 3
+  radius: 0.5
+  repulsionForce: 1
+--- !u!114 &2021936908615548318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7697071343886544114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1151c64e1047c5943a1d689edff95a1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radius: 5
+  boundaryForce: 0.5
