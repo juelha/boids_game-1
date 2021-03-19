@@ -16,7 +16,7 @@ public class BoidSpawner : MonoBehaviour
         for(int i = 0; i < number; ++i) {
             // anything inside of sphere is going to be a valid spawn location 
             //                                           sphere at 0/0/0 with r=1           
-            Instantiate(prefab, this.transform.position + Random.insideUnitSphere * radius, Random.rotation);
+            Instantiate(prefab, this.transform.position + Random.insideUnitSphere * radius, Random.rotation, this.transform);
         }
     }
 
