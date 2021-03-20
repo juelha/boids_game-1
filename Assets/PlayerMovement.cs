@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         //float midPoint = (transform.position - Camera.main.transform.position).magnitude * 0.5f;
@@ -30,4 +30,6 @@ public class PlayerMovement : MonoBehaviour
         
         controller.Move(move * speed * Time.deltaTime);
     }
+
+
 }
