@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// test
 [RequireComponent(typeof(Boid))]
 
 public class BoidRules : MonoBehaviour {
