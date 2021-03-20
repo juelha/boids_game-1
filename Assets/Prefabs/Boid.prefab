@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 0.5
-  repulsionForce: 1
+  repulsionForce: 5
 --- !u!114 &2021936908615548318
 MonoBehaviour:
   m_ObjectHideFlags: 0
