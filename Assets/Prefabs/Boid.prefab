@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7697071343886544116}
   - component: {fileID: 7697071343886544117}
   - component: {fileID: 2021936908615548318}
+  - component: {fileID: 6353993055464931647}
   m_Layer: 0
   m_Name: Boid
   m_TagString: Untagged
@@ -107,7 +108,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7697071343886544114}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97c579ab8d7f85349863f06bbc5d101e, type: 3}
   m_Name: 
@@ -120,7 +121,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7697071343886544114}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28c6bffa78047c6428dc52fed4012f8e, type: 3}
   m_Name: 
@@ -133,7 +134,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7697071343886544114}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51fdbf918c3bc484398bf5e7ab0f6e8a, type: 3}
   m_Name: 
@@ -154,3 +155,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 5
   boundaryForce: 0.5
+--- !u!114 &6353993055464931647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7697071343886544114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 123173140ee83ba49adad1751452636c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  separationRadius: 0.5
+  radius: 5
+  separationForce: 2
+  alignmentForce: 2
+  cohesionForce: 2
