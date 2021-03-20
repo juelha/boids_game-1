@@ -12,8 +12,6 @@ public class TDControl : MonoBehaviour
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    public bool onlyKeyboard;
-
     [Header("Rotation Settings")]
     public float rotationSpeed = 180;
     public Vector2 mouseVerticaleClamp = new Vector2(-20, 20);
@@ -62,7 +60,7 @@ public class TDControl : MonoBehaviour
 
         Rotation();
         CameraTransform();
-        if (liftOn == true && onlyKeyboard == false) Lift();
+        if (liftOn == true) Lift();
 
         //--------------
     }
@@ -75,23 +73,14 @@ public class TDControl : MonoBehaviour
     {
         //--------------
 
-        if (onlyKeyboard == false)
+        if (Mathf.Abs(Input.GetAxis("Mouse X")) + Mathf.Abs(Input.GetAxis("Mouse Y")) > 0)
         {
-            if (Mathf.Abs(Input.GetAxis("Mouse X")) + Mathf.Abs(Input.GetAxis("Mouse Y")) > 0)
-            {
-                mouseX += rotationSpeed * 0.01f * Input.GetAxis("Mouse X") * 0.3f;
-                mouseY -= rotationSpeed * 0.01f * Input.GetAxis("Mouse Y") * 0.3f;
-            }
+            mouseX += rotationSpeed * 0.01f * Input.GetAxis("Mouse X") * 0.3f;
+            mouseY -= rotationSpeed * 0.01f * Input.GetAxis("Mouse Y") * 0.3f;
         }
-        else
-        {
-            mouseX += rotationSpeed * 0.01f * Input.GetAxis("Horizontal") * 0.3f;
-            mouseY += rotationSpeed * 0.01f * Input.GetAxis("Vertical") * 0.3f;
-        }
-
         mouseY = Mathf.Clamp(mouseY, mouseVerticaleClamp.x, mouseVerticaleClamp.y);
         tr.rotation = Quaternion.Slerp(tr.rotation, Quaternion.Euler(mouseY, mouseX + rotationStart.y, 0), smoothMouse * Time.deltaTime);
-
+        
         //--------------
     }
 
