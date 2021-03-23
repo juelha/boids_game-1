@@ -28,6 +28,7 @@ public class ObjData {
 public class Spawner : MonoBehaviour
 {
     public int instances;
+    
     public Vector3 maxPos;
     public Mesh objMesh;
     public Material objMat;
@@ -38,6 +39,7 @@ public class Spawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        instances = 8;
         int batchIndexNum = 0;
         List<ObjData> currBatch = new List<ObjData>();  // help track in for loop
         for(int i = 0; i < instances; i++) {

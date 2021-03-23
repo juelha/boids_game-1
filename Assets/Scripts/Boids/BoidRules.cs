@@ -51,7 +51,9 @@ public class BoidRules : MonoBehaviour {
 
         if (found > 0) {
             average_alignment = average_alignment / found;
-            boid.velocity += Vector3.Lerp(boid.velocity, average_alignment, Time.deltaTime); // gets closer to velocity we want to achieve
+            boid.velocity += average_alignment;
+
+            //boid.velocity += Vector3.Lerp(boid.velocity, average_alignment, Time.deltaTime); // gets closer to velocity we want to achieve
         }
 
         // reset
@@ -70,7 +72,8 @@ public class BoidRules : MonoBehaviour {
 
         if (found > 0) {
             average_cohesion = average_cohesion / found;
-            boid.velocity += Vector3.Lerp(Vector3.zero, average_cohesion, average_cohesion.magnitude / radius); //the closer the less impact
+            boid.velocity += average_cohesion;
+          //  boid.velocity += Vector3.Lerp(Vector3.zero, average_cohesion, average_cohesion.magnitude / radius); //the closer the less impact
         }
 
 
@@ -92,7 +95,8 @@ public class BoidRules : MonoBehaviour {
 
         if (found > 0) {
             average_separation = average_separation / found;
-            boid.velocity -= Vector3.Lerp(Vector3.zero, average_separation, average_separation.magnitude / radius) * separationForce;
+            boid.velocity -= average_separation;
+           // boid.velocity -= Vector3.Lerp(Vector3.zero, average_separation, average_separation.magnitude / radius) * separationForce;
 
         }
 
