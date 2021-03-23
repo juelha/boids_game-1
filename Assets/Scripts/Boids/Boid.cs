@@ -42,3 +42,5 @@ public class Boid : MonoBehaviour
         
     }
 }
+
+//["staticEnv", "random_reward", "random_player", "random_reward_and_player", "random_and_move_static_Env", "random_and_move_static_change_in_Beginning_Env", "random_and_move_static_new_direction_Env"]
