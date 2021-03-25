@@ -25,11 +25,12 @@ public class ObjData {
     // TODO deconstructor 
 }
 
-public class Spawner : MonoBehaviour
+public class DrawMeshInstanced : MonoBehaviour
 {
     public int instances;
     
     public Vector3 maxPos;
+    public GameObject prefab;
     public Mesh objMesh;
     public Material objMat;
 
@@ -39,7 +40,7 @@ public class Spawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instances = 8;
+        //instances = 8;
         int batchIndexNum = 0;
         List<ObjData> currBatch = new List<ObjData>();  // help track in for loop
         for(int i = 0; i < instances; i++) {
