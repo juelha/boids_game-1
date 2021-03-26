@@ -65,6 +65,8 @@ public class DrawMeshInstanced : MonoBehaviour
             }
                 
         }
+
+        argsBuffer.Release(); // fix error message
     }
 
     // Update is called once per frame
