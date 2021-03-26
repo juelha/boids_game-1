@@ -10,6 +10,8 @@ public class ObjData {
     public Vector3 scale;
     public Quaternion rot;  // basically rotations within unity
 
+
+
     public Matrix4x4 matrix {
         get {  // so other classes cant fuck with it
             return Matrix4x4.TRS(pos, rot, scale);
@@ -30,19 +32,29 @@ public class DrawMeshInstanced : MonoBehaviour
     public int instances;
     
     public Vector3 maxPos;
+    public float radius;
+
     public GameObject prefab;
     public Mesh objMesh;
     public Material objMat;
 
-    private List<List<ObjData>> batches = new List<List<ObjData>>();  // why nested list -> limitation to Graph.DrawMeshInstanced: u cant draw over 1024 obj -> if we want to draw more we have to batch up all the objs we create -> to sections of 1000 and store them in lists of lists == batches
+    private List<List<GameObject>> batches = new List<List<GameObject>>();  // why nested list -> limitation to Graph.DrawMeshInstanced: u cant draw over 1024 obj -> if we want to draw more we have to batch up all the objs we create -> to sections of 1000 and store them in lists of lists == batches
+
+    // buffer stuff
+    private ComputeBuffer positionBuffer;
+    private ComputeBuffer argsBuffer;
+    private uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
+
 
 
     // Start is called before the first frame update
     void Start()
     {
+        argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
+        
         //instances = 8;
         int batchIndexNum = 0;
-        List<ObjData> currBatch = new List<ObjData>();  // help track in for loop
+        List<GameObject> currBatch = new List<GameObject>();  // help track in for loop
         for(int i = 0; i < instances; i++) {
             AddObj(currBatch, i);
             batchIndexNum++;
@@ -58,27 +70,30 @@ public class DrawMeshInstanced : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
         RenderBatches();
     }
 
     //                                           useful for when you want to modify pos based on loop number (eg straight lines)
-    private void AddObj(List<ObjData> currBatch, int i) {
-        Vector3 position = new Vector3(Random.Range(-maxPos.x, maxPos.x), Random.Range(-maxPos.y, maxPos.y), Random.Range(-maxPos.z, maxPos.z));
-        currBatch.Add(new ObjData(position, new Vector3(2, 2, 2), Quaternion.identity));
-            
+    private void AddObj(List<GameObject> currBatch, int i) {
+        Instantiate(prefab, this.transform.position + Random.insideUnitSphere * radius, Random.rotation, this.transform);
 
     }
 
-    private List<ObjData> BuildNewBatch() {
-        return new List<ObjData>();
+
+
+    private List<GameObject> BuildNewBatch() {
+        return new List<GameObject>();
     }
 
     private void RenderBatches() {
         foreach (var batch in batches) {
             //                                             stores stuff like in Transform
-            Graphics.DrawMeshInstanced(objMesh, 0, objMat, batch.Select((a) => a.matrix).ToList()); 
+           //raphics.DrawMeshInstanced(objMesh, 0, objMat, batch.Select((a) => a.matrix).ToList());
+            // Render
+            Graphics.DrawMeshInstancedIndirect(objMesh, 0, objMat, new Bounds(Vector3.zero, new Vector3(100.0f, 100.0f, 100.0f)), argsBuffer);
         }
     }
-
+    
 
 }
