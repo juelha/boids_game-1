@@ -29,6 +29,13 @@ public class PlayerMovement : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
         
         controller.Move(move * speed * Time.deltaTime);
+        
+        // check for upper boundary (water surface, currently at y = 8.5)
+        if (transform.position.y > 7.9f)
+        {
+            // keep player position at 8.4
+            transform.position = new Vector3(transform.position.x, 7.9f, transform.position.z);
+        }
     }
 
 
