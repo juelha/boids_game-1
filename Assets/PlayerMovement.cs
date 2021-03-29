@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
-    public float speed = 10;
+    public float speed = 3f;
+    public float slowDownFor = 3f;
     // Start is called before the first frame update
     //public float sensibility;
 
@@ -36,6 +37,21 @@ public class PlayerMovement : MonoBehaviour
             // keep player position at 8.4
             transform.position = new Vector3(transform.position.x, 7.9f, transform.position.z);
         }
+    }
+
+    //Slow down function
+    IEnumerator ExecuteAfterTime(float time)
+    {
+        speed /= 2;
+        yield return new WaitForSeconds(time);
+        speed *= 2;
+        //Debug.Log("Here 74
+    }
+
+    public void slowDown()
+    {
+        StartCoroutine(ExecuteAfterTime(slowDownFor));
+
     }
 
 

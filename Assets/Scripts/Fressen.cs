@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 public class Fressen : MonoBehaviour
 {
+    [SerializeField]
+    private PlayerMovement player;
     int score = 0;
     public float gametime = 60f; 
     public Text scoreText;
@@ -13,6 +15,7 @@ public class Fressen : MonoBehaviour
     public float minSize = 3f;
     public float increaseSize = 0.1f;
     public float decreaseSize = 0.001f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -71,6 +74,9 @@ public class Fressen : MonoBehaviour
                 //Debug.Log(score);
             score += 1;
             Destroy(col.gameObject);
+
+            //slow down when eat fish
+            player.slowDown();
 
         }
     }
