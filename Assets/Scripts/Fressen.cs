@@ -10,6 +10,7 @@ public class Fressen : MonoBehaviour
     public float gametime = 60f; 
     public Text scoreText;
     public Text timeText;
+    public Text speed;
 
     public float maxSize = 50f;
     public float minSize = 3f;
@@ -36,7 +37,8 @@ public class Fressen : MonoBehaviour
         //Min should be 0
         gametime = Mathf.Max(0, gametime);
 
-
+        //display speed
+        speed.text = player.speed.ToString("F2");
         //Make shark smaller with time
         transform.localScale -= new Vector3(1f, 1f, 0f) * decreaseSize;
         if (transform.localScale.x < minSize)
