@@ -7,6 +7,9 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController controller;
     public float speed = 3f;
     public float slowDownFor = 3f;
+    public float speedUpFor = 3f;
+    public float waitForNextSpeed = 5f;
+    private bool isFast = false;
     // Start is called before the first frame update
     //public float sensibility;
 
@@ -16,7 +19,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         //Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         //float midPoint = (transform.position - Camera.main.transform.position).magnitude * 0.5f;
@@ -37,10 +40,36 @@ public class PlayerMovement : MonoBehaviour
             // keep player position at 8.4
             transform.position = new Vector3(transform.position.x, 7.9f, transform.position.z);
         }
+
+        //If u press space, speed up
+        if (Input.GetButton("Jump") && !isFast)
+        {
+            speedUp();
+        }
     }
 
+    //Speed up
+    public void speedUp()
+    {
+
+        StartCoroutine(speedUpTime(speedUpFor, waitForNextSpeed));
+    }
+
+    IEnumerator speedUpTime(float time, float wait)
+    {
+        speed *= 2;
+        isFast = true;
+        yield return new WaitForSeconds(time);
+        speed /= 2;
+        yield return new WaitForSeconds(wait);
+        isFast = false;
+
+
+    }
+
+
     //Slow down function
-    IEnumerator ExecuteAfterTime(float time)
+    IEnumerator slowDownTime(float time)
     {
         speed /= 2;
         yield return new WaitForSeconds(time);
@@ -50,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void slowDown()
     {
-        StartCoroutine(ExecuteAfterTime(slowDownFor));
+        StartCoroutine(slowDownTime(slowDownFor));
 
     }
 
