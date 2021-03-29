@@ -9,6 +9,9 @@ public class Fressen : MonoBehaviour
     public Text scoreText;
     public Text timeText;
 
+    public float maxSize = 50f;
+    public float increaseSize = 0.1f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,10 +44,16 @@ public class Fressen : MonoBehaviour
     private void OnCollisionEnter(Collision col)
     //private void OnTriggerEnter(Collider col)
     {
-        Debug.Log(col.gameObject.tag);
         if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
-            Debug.Log(score);
+            //Increase shark, when he eats fish, but with maximum size 
+            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+            if(transform.localScale.x > maxSize)
+            {
+                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+            }
+
+                //Debug.Log(score);
             score += 1;
             Destroy(col.gameObject);
 
