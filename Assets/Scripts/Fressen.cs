@@ -15,7 +15,7 @@ public class Fressen : MonoBehaviour
     public float maxSize = 50f;
     public float minSize = 3f;
     public float increaseSize = 0.1f;
-    public float decreaseSize = 0.001f;
+    public float decreaseSize = 0.0001f;
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +39,8 @@ public class Fressen : MonoBehaviour
 
         //display speed
         speed.text = player.speed.ToString("F2");
+
+
         //Make shark smaller with time
         transform.localScale -= new Vector3(1f, 1f, 0f) * decreaseSize;
         if (transform.localScale.x < minSize)
