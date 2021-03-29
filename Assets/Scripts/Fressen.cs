@@ -39,9 +39,12 @@ public class Fressen : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision col)
+    //private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.tag == "boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
+        Debug.Log(col.gameObject.tag);
+        if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
+            Debug.Log(score);
             score += 1;
             Destroy(col.gameObject);
 

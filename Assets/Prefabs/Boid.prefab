@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 7697071343886544116}
   - component: {fileID: 7697071343886544117}
   - component: {fileID: 2021936908615548318}
-  - component: {fileID: -8224589493224939079}
   - component: {fileID: 2476244275986034702}
   m_Layer: 0
   m_Name: Boid
@@ -156,22 +155,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 5
   boundaryForce: 0.5
---- !u!54 &-8224589493224939079
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7697071343886544114}
-  serializedVersion: 2
-  m_Mass: 2
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
 --- !u!65 &2476244275986034702
 BoxCollider:
   m_ObjectHideFlags: 0
