@@ -7,6 +7,7 @@ public class mouseLook : MonoBehaviour
     public float mouseSensitivity = 200f;
     public Transform playerBody;
     float xRotation = 0f;
+    public float maxDegreeX = 45f;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,16 +19,16 @@ public class mouseLook : MonoBehaviour
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+        xRotation = -mouseY;
+        playerBody.Rotate(Vector3.right * xRotation);
+        playerBody.Rotate(Vector3.up * mouseX);
         //playerBody.Rotate(Vector3.up * mouseX + Vector3.left * mouseY );
 
-        xRotation = -mouseY;
         //xRotation = Mathf.Clamp(xRotation, -90f, 90f);
         
         //Debug.Log(xRotation);
         //transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        playerBody.Rotate(Vector3.right * xRotation);
-        playerBody.Rotate(Vector3.up * mouseX);
 
 
         //set z rotation to 0, for better gameplay
@@ -35,15 +36,15 @@ public class mouseLook : MonoBehaviour
         rotationVector.z = 0f;
 
         //set x rotation for natural movement
-        if(rotationVector.x < 180 && rotationVector.x > 45)
+        if(rotationVector.x < 180 && rotationVector.x > maxDegreeX)
         {
             rotationVector.x = 45f;
         }
-        if (rotationVector.x < 315 && rotationVector.x > 180)
+        if (rotationVector.x < 360 - maxDegreeX && rotationVector.x > 180)
         {
             rotationVector.x = 315f;
         }
-        Debug.Log(rotationVector.x);
+        //Debug.Log(rotationVector.x);
         playerBody.transform.rotation = Quaternion.Euler(rotationVector);
 
 
