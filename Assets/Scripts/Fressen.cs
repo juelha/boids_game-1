@@ -5,12 +5,16 @@ using UnityEngine.UI;
 public class Fressen : MonoBehaviour
 {
     int score = 0;
+    public float gametime = 60f; 
     public Text scoreText;
+    public Text timeText;
 
     // Start is called before the first frame update
     void Start()
     {
         score = 0;
+        
+
     }
 
     // Update is called once per frame
@@ -18,7 +22,9 @@ public class Fressen : MonoBehaviour
     {
         //Update Score
         scoreText.text = "Score: " + score.ToString();
-        
+        timeText.text = (int)gametime + "s";
+        gametime -= Time.deltaTime;
+
     }
 
     private void OnCollisionEnter(Collision col)
