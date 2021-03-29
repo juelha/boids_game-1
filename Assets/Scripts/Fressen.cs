@@ -10,8 +10,9 @@ public class Fressen : MonoBehaviour
     public Text timeText;
 
     public float maxSize = 50f;
+    public float minSize = 3f;
     public float increaseSize = 0.1f;
-
+    public float decreaseSize = 0.001f;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +33,18 @@ public class Fressen : MonoBehaviour
         //Min should be 0
         gametime = Mathf.Max(0, gametime);
 
+
+        //Make shark smaller with time
+        transform.localScale -= new Vector3(1f, 1f, 0f) * decreaseSize;
+        if (transform.localScale.x < minSize)
+        {
+            transform.localScale = new Vector3(minSize, minSize, transform.localScale.z);
+            //ende!
+        }
+
+
+
+
         //Stop Game if gametime == 0 or if esc
         if (gametime <= 0 || Input.GetButton("Cancel"))
         {
@@ -39,6 +52,8 @@ public class Fressen : MonoBehaviour
             //Not in the Editor, just in build version
             Application.Quit();
         }
+
+
     }
 
     private void OnCollisionEnter(Collision col)
