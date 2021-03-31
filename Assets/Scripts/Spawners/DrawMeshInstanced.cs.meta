@@ -4,6 +4,9 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - prefab: {fileID: 7697071343886544114, guid: be6f7994c3a36924e9f616121adb814a,
+      type: 3}
+  - objMesh: {instanceID: 0}
   - objMat: {fileID: 2100000, guid: 734b265000eb8904c8389bb109d55686, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
