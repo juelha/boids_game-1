@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class mouseLook : MonoBehaviour
 {
+    public Camera cam1;
+    public Camera cam2;
+
     public float mouseSensitivity = 200f;
     public Transform playerBody;
     float xRotation = 0f;
@@ -12,11 +15,21 @@ public class mouseLook : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        cam1.enabled = true;
+        cam2.enabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Camera Change
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            cam1.enabled = !cam1.enabled;
+            cam2.enabled = !cam2.enabled;
+        }
+
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
         xRotation = -mouseY;
