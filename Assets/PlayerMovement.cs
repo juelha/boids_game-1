@@ -29,7 +29,10 @@ public class PlayerMovement : MonoBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-        
+
+        //verhindern, dass er rückwärts kann
+        if (z < 0) z = 0;
+
         Vector3 move = transform.right * x + transform.forward * z;
         
         controller.Move(move * speed * Time.deltaTime);
