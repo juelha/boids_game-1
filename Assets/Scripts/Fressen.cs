@@ -6,8 +6,10 @@ public class Fressen : MonoBehaviour
 {
     [SerializeField]
     private PlayerMovement player;
+    //public Transform parent;
+
     int score = 0;
-    public float gametime = 60f; 
+    public float gametime = 60f;
     public Text scoreText;
     public Text timeText;
     public Text speed;
@@ -17,11 +19,13 @@ public class Fressen : MonoBehaviour
     public float increaseSize = 0.1f;
     public float decreaseSize = 0.0001f;
 
+    //Immer nur einen auf einmal
+    //private bool amFressen = false;
     // Start is called before the first frame update
     void Start()
     {
         score = 0;
-        
+
 
     }
 
@@ -70,18 +74,76 @@ public class Fressen : MonoBehaviour
         {
             //Increase shark, when he eats fish, but with maximum size 
             transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
-            if(transform.localScale.x > maxSize)
+            if (transform.localScale.x > maxSize)
             {
                 transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
             }
 
-                //Debug.Log(score);
+            //Debug.Log(score);
             score += 1;
-            Destroy(col.gameObject);
+
+
+            //Collision coll_copy = col;
+
+            //Destry and Highlight boid
+            DestroyBoidAfter(3f, col);
+            //StartCoroutine(DestroyBoidAfterTime(1f, coll_copy)); 
+            //Destroy(col.gameObject);
 
             //slow down when eat fish
             player.slowDown();
 
         }
     }
+    private void DestroyBoidAfter(float time, Collision coll)
+    {
+        //Highlight boid
+        Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
+        boid.SetColor("_Color", Color.red);
+
+        //Destroy all movement skripts
+        Destroy(coll.gameObject.GetComponent<BoidAlignment>());
+        Destroy(coll.gameObject.GetComponent<BoidCohesion>());
+        Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
+        Destroy(coll.gameObject.GetComponent<BoidSeparation>());
+        Destroy(coll.gameObject.GetComponent<Boid>());
+
+        //Set new Parent = Player
+        coll.gameObject.transform.SetParent(player.gameObject.transform);
+        
+        Destroy(coll.gameObject, time);
+
+
+    }
+    /*
+    IEnumerator DestroyBoidAfterTime(float time, Collision coll)
+    {
+        Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
+        //Debug.Log(boid);
+        boid.SetColor("_Color", Color.red);
+
+        //Debug.Log(col.gameObject);
+
+        //Destroy(coll.gameObject.GetComponent<BoidAlignment>());
+        //Destroy(coll.gameObject.GetComponent<BoidCohesion>());
+        //Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
+        //Destroy(coll.gameObject.GetComponent<BoidSeparation>());
+        //Destroy(coll.gameObject.GetComponent<Boid>());
+        //amFressen = true;
+        Debug.Log("Destroying " + coll.gameObject.GetInstanceID());
+        yield return new WaitForSeconds(time);
+
+
+        //Prevent wrong destroing
+        if(coll.gameObject.tag != "Player")
+        {
+            Debug.Log("Destroying " + coll.gameObject.GetInstanceID());
+
+            Destroy(coll.gameObject);
+
+
+        }
+        //amFressen = false;
+    }
+    */
 }
