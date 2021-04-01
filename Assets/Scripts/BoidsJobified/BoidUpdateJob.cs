@@ -1,8 +1,14 @@
 using Unity.Jobs;
 using Unity.Collections;
 
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using UnityEngine;
+using UnityEngine.Jobs;
 
 
+[BurstCompile]
 
 // create a job
 public struct BoidUpdateJob : IJobParallelFor {  // IJobParallelFor can run same logic over a list of items
@@ -17,8 +23,12 @@ public struct BoidUpdateJob : IJobParallelFor {  // IJobParallelFor can run same
         // 3. put it back in
 
         var curDataObj = BoidDataArray[index];  // 1. ref to current data obj 
-        curDataObj.Update();                    // 2.
+        curDataObj.Update();                    // 2. do stuff
+
+
+
         BoidDataArray[index] = curDataObj;      // 3. pass the data back in the array using index
     }
+
 }
 

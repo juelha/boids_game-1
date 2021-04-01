@@ -5,28 +5,6 @@ using UnityEngine;
 
 
 
-public class ObjData {
-    public Vector3 pos;
-    public Vector3 scale;
-    public Quaternion rot;  // basically rotations within unity
-
-
-
-    public Matrix4x4 matrix {
-        get {  // so other classes cant fuck with it
-            return Matrix4x4.TRS(pos, rot, scale);
-        }
-    }
-
-    public ObjData(Vector3 pos, Vector3 scale, Quaternion rot) {  // parameterized constructor
-        this.pos = pos;
-        this.scale = scale;
-        this.rot = rot; 
-    }
-
-    // TODO deconstructor 
-}
-
 public class DrawMeshInstanced : MonoBehaviour
 {
     public int instances;

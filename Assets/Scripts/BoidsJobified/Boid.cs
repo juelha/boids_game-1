@@ -31,7 +31,7 @@ public class Boid : MonoBehaviour {
             }
             pos += velocity;// * Time.deltaTime; // move 10 units every sec
             quat = Quaternion.LookRotation(velocity); // look in direction its going 
-
+           
         }
 
         public Data(Boid boid) {

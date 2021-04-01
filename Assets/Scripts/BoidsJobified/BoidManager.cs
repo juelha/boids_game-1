@@ -10,6 +10,7 @@ public class BoidManager : MonoBehaviour {
     [SerializeField] private List<Boid> boids;
     private NativeArray<Boid.Data> _boidsDataArray;
     private BoidUpdateJob _job;
+    //private BoidMoveJob move_job;
 
     private void Awake() {
         // include a boid data array based on its list of buildings from the scene
@@ -33,7 +34,8 @@ public class BoidManager : MonoBehaviour {
         // length (number of items the _job will iterate over)
         // batchcount (size of each threaded batch)
         //        length = size of list, batchcount = 1    
-        var jobHandle = _job.Schedule(boids.Count, 1);  // this will get the _job running
+        var jobHandle = _job.Schedule(boids.Count, 1);
+              // this will get the _job running
 
         jobHandle.Complete();  // ensure that _job finished its work before next frame 
     }
