@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,25 +12,40 @@ public class HealthSystem : MonoBehaviour
 
     void Start()
     {
-
     }
 
-    public void inflictDamage(int damageAmount)
+    public void InflictDamage(int damageAmount)
     {
         this.healthPoints -= damageAmount;
-        Debug.Log("DAMAGE DAMAGE DAMAGE " + this.healthPoints);
+        Debug.Log("health: " + this.healthPoints);
 
+        this.UpdateHealthBarUI();
 
-        float healthBarPercentage = this.healthPoints / this.MAX_HEALTH_POINTS;
-        Vector3 tempLocalScale = this.healthBar.transform.localScale;
-        this.healthBar.transform.localScale = new Vector3(tempLocalScale.x * healthBarPercentage, tempLocalScale.y, tempLocalScale.z);
-
-        if (this.healthPoints < 0)
+        if (!this.IsAlive())
         {
-            Debug.Log("DEAD DEAD DEAD DEAD DEAD ");
-            // TODO CHANGE GLOBAL GAME STATE HERE
-            // TODO CHANGE GLOBAL GAME STATE HERE
-            // TODO CHANGE GLOBAL GAME STATE HERE
+            this.ChangeGameState();
         }
+    }
+
+    private bool IsAlive()
+    {
+        return this.healthPoints > 0;
+    }
+
+    private void UpdateHealthBarUI()
+    {
+        float healthBarUIPoints = 0;
+
+        if (this.IsAlive())
+        {
+            healthBarUIPoints = this.healthPoints / this.MAX_HEALTH_POINTS;
+        }
+        this.healthBar.transform.localScale = new Vector3(healthBarUIPoints, 1, 1);
+    }
+
+    private void ChangeGameState()
+    {
+        // TODO CHANGE GLOBAL GAME STATE HERE
+        throw new NotImplementedException("YOU ARE DEAD! TODO CHANGE GLOBAL GAME STATE HERE");
     }
 }
