@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -34,9 +34,9 @@ public class PlayerMovement : MonoBehaviour
         if (z < 0) z = 0;
 
         Vector3 move = transform.right * x + transform.forward * z;
-        
+
         controller.Move(move * speed * Time.deltaTime);
-        
+
         // check for upper boundary (water surface, currently at y = 8.5)
         if (transform.position.y > 7.9f)
         {

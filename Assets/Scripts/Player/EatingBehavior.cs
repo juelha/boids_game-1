@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class Fressen : MonoBehaviour
+public class EatingBehavior : MonoBehaviour
 {
     [SerializeField]
     private PlayerMovement player;
