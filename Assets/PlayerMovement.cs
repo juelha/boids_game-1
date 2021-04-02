@@ -30,6 +30,9 @@ public class PlayerMovement : MonoBehaviour
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
+        //seitwärts langsamer
+        x = x / 2;
+
         //verhindern, dass er rückwärts kann
         if (z < 0) z = 0;
 
