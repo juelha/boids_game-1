@@ -58,6 +58,7 @@ public class mouseLook : MonoBehaviour
             rotationVector.x = 315f;
         }
         //Debug.Log(rotationVector.x);
+
         playerBody.transform.rotation = Quaternion.Euler(rotationVector);
 
 
