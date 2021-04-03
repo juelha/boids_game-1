@@ -39,10 +39,11 @@ public class BoidManager : MonoBehaviour {
 
             // anything inside of sphere is going to be a valid spawn location 
             //                                           sphere at 0/0/0 with r=1           
-            boid = new GameObject();
-          //  var bla = boid.transform; 
-            boid = Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation);
-            boids.Add(boid);
+            // boid = new GameObject();
+            //  var bla = boid.transform; 
+            boids.Add(Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation));
+           //   boid = Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation);
+           // boids.Add(boid);
 
             Transform[] TransformTemp = new Transform[100];
             TransformTemp[i] = boid.transform;
@@ -97,6 +98,9 @@ public class BoidManager : MonoBehaviour {
 
 
         UpdateJobHandle = _UpdateJob.Schedule(TransformAccessArray);
+        //Velocities.Dispose();
+        //UpdateJobHandle.Complete();
+        //TransformAccessArray.Dispose();
     }
 
 
@@ -106,7 +110,7 @@ public class BoidManager : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        Velocities.Dispose();
+ //       Velocities.Dispose();
         TransformAccessArray.Dispose();
     }
 }

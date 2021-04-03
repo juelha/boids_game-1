@@ -30,7 +30,7 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
         // move the given transforms forward in their local coordinate system
         //  transform.localPosition += transform.localRotation * math.float3(0, 0, 1);
 
-        transform.position += vel * deltaTime;
+        transform.position = vel ;// * deltaTime;
     }
 
    // public void Execute(int index) {
