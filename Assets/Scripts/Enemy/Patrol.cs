@@ -6,6 +6,7 @@ public class Patrol : MonoBehaviour
 {
     private Transform _goal;
     public Transform Route;
+    private Rigidbody rb;
     public float collisionRadius;
     public float speed;
     // Start is called before the first frame update
@@ -15,10 +16,12 @@ public class Patrol : MonoBehaviour
         transform.position = _goal.position;
 
         nextGoal();
+
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         move();
 
@@ -52,6 +55,9 @@ public class Patrol : MonoBehaviour
         //Move Enemy in direction of next Node
         Vector3 dir = _goal.position - transform.position;
 
-        transform.position += dir.normalized * speed * Time.deltaTime;
+        //rb.MovePosition(transform.position + speed * Time.deltaTime * dir.normalized);
+        rb.velocity = dir.normalized * speed;
+        //rb.AddForce(dir * speed, ForceMode.Force);
+        //transform.position += dir.normalized * speed * Time.deltaTime;
     }
 }
