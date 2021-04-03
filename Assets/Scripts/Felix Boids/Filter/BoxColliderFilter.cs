@@ -14,6 +14,7 @@ public class BoxColliderFilter : ContextFilter
             if (itemcollider != null && itemcollider.GetType() == typeof(BoxCollider))
             {
                 filtered.Add(item);
+                Debug.LogWarning("HuHu");
             }
         }
         return filtered;

@@ -9,7 +9,6 @@ public class PhysicsLayerFilter : ContextFilter
    
     public override List<Transform> Filter(FlockAgent agent, List<Transform> original)
     {
-        Debug.LogWarning("Box in filter");
 
         List<Transform> filtered = new List<Transform>();
         foreach (Transform item in original)

@@ -18,14 +18,17 @@ public class Flock : MonoBehaviour
     public float maxSpeed = 5f;
     [Range(1f, 10f)]
     public float neighborRadius = 1.5f;
+    [Range(0f, 10f)]
+    public float obstacleAvoidanceRadius = 2f;
     [Range(0f, 1f)]
     public float avoidanceRadiusMultiplier = 0.5f;
 
     float squareMaxSpeed;
     float squareNeighborRadius;
     float squareAvoidanceRadius;
+    float squareObstacleAvoidanceRadius;
     public float SquareAvoidanceRadius { get { return squareAvoidanceRadius; } }
-
+    public float SquareObstacleAvoidanceRadius {get { return squareObstacleAvoidanceRadius; } }
     // Start is called before the first frame update
     void Start()
     {
@@ -34,6 +37,7 @@ public class Flock : MonoBehaviour
         squareMaxSpeed = maxSpeed * maxSpeed;
         squareNeighborRadius = neighborRadius * neighborRadius;
         squareAvoidanceRadius = squareNeighborRadius * avoidanceRadiusMultiplier * avoidanceRadiusMultiplier;
+        squareObstacleAvoidanceRadius = obstacleAvoidanceRadius * obstacleAvoidanceRadius;
 
         //instatiation of the flock, determining the number of boids in the starting count
         for (int i = 0; i < startingCount; i++)

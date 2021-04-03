@@ -1,9 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Flock/Behavior/Avoidance")]
-public class AvoidanceBehavior : FilteredFlockBehavior
+[CreateAssetMenu(menuName = "Flock/Behavior/Object Avoidance")]
+public class ObjectAvoidanceBehavior : FilteredFlockBehavior
 {
 
     public override Vector3 CalculateMove(FlockAgent agent, List<Transform> context, Flock flock)
@@ -16,18 +16,23 @@ public class AvoidanceBehavior : FilteredFlockBehavior
         Vector3 avoidanceMove = Vector3.zero;
         int nAvoid = 0;
         List<Transform> filteredContext = (filter == null) ? context : filter.Filter(agent, context);
-        
+
         foreach (Transform item in filteredContext)
         {
-            //Debug.Log()
-            //if neighbor is to near -> avoid
-            if (Vector3.SqrMagnitude(item.position - agent.transform.position) < flock.SquareAvoidanceRadius)
+            Collider obstacleCollider = item.GetComponent<Collider>();
+            //get nearest point of the collider of the obstacle
+            Vector3 closestPointofObstacle = obstacleCollider.ClosestPoint(agent.transform.position);
+
+            // if obstacle is near -> avoid
+            if (Vector3.SqrMagnitude(closestPointofObstacle - agent.transform.position) < flock.SquareObstacleAvoidanceRadius)
             {
                 nAvoid++;
                 //setting vector pointing away from neighbor
                 avoidanceMove += (Vector3)(agent.transform.position - item.position);
             }
         }
+
+        
         if (nAvoid > 0)
             avoidanceMove /= nAvoid;
 
