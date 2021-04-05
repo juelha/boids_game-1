@@ -19,6 +19,7 @@ public class EatingBehavior : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
+    public TextMeshProUGUI highScore;
 
     public float maxSize = 50f;
     public float minSize = 3f;
@@ -31,6 +32,7 @@ public class EatingBehavior : MonoBehaviour
     void Start()
     {
         this.score = 0;
+        this.highScore.text = "HighScore: " + PlayerPrefs.GetInt("HighScore", 0);
     }
 
     // Update is called once per frame
@@ -82,11 +84,20 @@ public class EatingBehavior : MonoBehaviour
         this.addScore.text = "";
     }
 
+    private void HighScore()
+    {
+        if(this.score > PlayerPrefs.GetInt("HighScore", 0))
+        {
+            PlayerPrefs.SetInt("HighScore", this.score);
+            highScore.text = "HighScore: " + this.score.ToString();
+        }
+    }
     //Adds some points to your score
     public void AddScore(int plusScore)
     {
         this.score += plusScore;
 
+        HighScore();
         //shows your benefit for 3 secs
         StartCoroutine(DisplayAddScoreUI(plusScore, 3f));
         DisplayScoreUI();
