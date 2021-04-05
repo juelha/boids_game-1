@@ -8,7 +8,7 @@ public class MainMenu : MonoBehaviour
 
     public void Play()
     {
-        GameState.TransitionTo(GameState.State.Playing);
+        GameState.Transition(GameState.Event.StartGame);
     }
 
     public void Quit()

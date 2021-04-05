@@ -31,11 +31,11 @@ public class GameOverPanelManager : MonoBehaviour
 
     public void MainMenu()
     {
-        GameState.TransitionTo(GameState.State.MainMenu);
+        GameState.Transition(GameState.Event.EnterMainMenu);
     }
 
     public void Play()
     {
-        GameState.TransitionTo(GameState.State.Playing);
+        GameState.Transition(GameState.Event.StartGame);
     }
 }

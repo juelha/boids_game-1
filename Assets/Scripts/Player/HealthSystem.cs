@@ -23,7 +23,7 @@ public class HealthSystem : MonoBehaviour
 
         if (!this.IsAlive())
         {
-            GameState.TransitionTo(GameState.State.GameOver);
+            GameState.Transition(GameState.Event.FinishGame);
         }
     }
 

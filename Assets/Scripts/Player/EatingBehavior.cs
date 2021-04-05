@@ -41,23 +41,14 @@ public class EatingBehavior : MonoBehaviour
 
         // this.ShrinkShark();
 
-        if (Input.GetButton("Cancel")) // "Cancel" means Escape key
+        if (Input.GetKeyDown(KeyCode.P) || Input.GetButton("Cancel")) // "Cancel" means Escape key
         {
-            /*
-            if (GameState.GetState() == GameState.State.Playing)
-            {
-                GameState.TransitionTo(GameState.State.Pause);
-            }
-            else if (GameState.GetState() == GameState.State.Pause)
-            {
-                GameState.TransitionTo(GameState.State.Playing);
-            }
-            */
+            GameState.Transition(GameState.Event.TogglePause);
         }
 
         if (this.IsGameOver())
         {
-            GameState.TransitionTo(GameState.State.GameOver);
+            GameState.Transition(GameState.Event.FinishGame);
         }
     }
 

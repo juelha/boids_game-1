@@ -20,44 +20,71 @@ public class GameState : MonoBehaviour
         return state;
     }
 
-    public static void TransitionTo(State nextState)
+    public enum Event
+    {
+        StartGame,
+        FinishGame,
+        EnterMainMenu,
+        TogglePause,
+    }
+
+    public static void Transition(Event event_)
     {
 
         switch (state)
         {
             case State.MainMenu:
-                if (nextState == State.Playing)
+                if (event_ == Event.StartGame)
                 {
-                    state = nextState;
+                    state = State.Playing;
                     LoadFirstLevel();
                 }
                 break;
             case State.Playing:
-                if (nextState == State.GameOver)
+                if (event_ == Event.FinishGame)
                 {
-                    state = nextState;
+                    state = State.GameOver;
                     Cursor.visible = true;
                     Cursor.lockState = CursorLockMode.None;
                     // GamoOverPanelManager.cs shows/hides panel
                 }
+                if (event_ == Event.TogglePause)
+                {
+                    state = State.Pause;
+                    Cursor.visible = true;
+                    Cursor.lockState = CursorLockMode.None;
+                }
+                break;
+            case State.Pause:
+                if (event_ == Event.TogglePause)
+                {
+                    state = State.Playing;
+                    Cursor.visible = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+                if (event_ == Event.EnterMainMenu)
+                {
+                    state = State.MainMenu;
+                    LoadMainMenu();
+                }
                 break;
             case State.GameOver:
-                if (nextState == State.Playing)
+                if (event_ == Event.StartGame)
                 {
-                    state = nextState;
+                    state = State.Playing;
                     // TODO reset time, score and starting position
                     // LoadFirstLevel();
                     throw new NotImplementedException("TODO reset time, score and starting position");
                 }
-                if (nextState == State.MainMenu)
+                if (event_ == Event.EnterMainMenu)
                 {
-                    state = nextState;
+                    state = State.MainMenu;
                     LoadMainMenu();
-                    break;
                 }
                 break;
         }
     }
+
 
     private static void LoadFirstLevel()
     {
@@ -66,9 +93,8 @@ public class GameState : MonoBehaviour
 
     private static void LoadMainMenu()
     {
-        SceneManager.LoadScene("MainMenu"); // 1 or "SomeScene"
+        SceneManager.LoadScene("MainMenu");
     }
-
 
     void OnEnable()
     {
