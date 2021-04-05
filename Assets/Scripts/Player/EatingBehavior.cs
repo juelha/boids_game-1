@@ -73,6 +73,8 @@ public class EatingBehavior : MonoBehaviour
             //ende!
         }
     }
+
+    //shows sth for x secs
     IEnumerator DisplayAddScoreUI(int PlusScore,  float time)
     {
         this.addScore.text = "+" + PlusScore.ToString();
@@ -80,14 +82,13 @@ public class EatingBehavior : MonoBehaviour
         this.addScore.text = "";
     }
 
+    //Adds some points to your score
     public void AddScore(int plusScore)
     {
         this.score += plusScore;
 
-        StartCoroutine(DisplayAddScoreUI(plusScore, 1f));
-
-        //StartCoroutine(DisplayAddScoreUI("sf",1, 2));
-
+        //shows your benefit for 3 secs
+        StartCoroutine(DisplayAddScoreUI(plusScore, 3f));
         DisplayScoreUI();
     }
     public void DisplayScoreUI()
