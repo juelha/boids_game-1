@@ -15,6 +15,7 @@ public class EatingBehavior : MonoBehaviour
     public int score = 0;
 
     public float gametime = 60f;
+    public TextMeshProUGUI addScore;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
@@ -72,11 +73,29 @@ public class EatingBehavior : MonoBehaviour
             //ende!
         }
     }
+    IEnumerator DisplayAddScoreUI(int PlusScore,  float time)
+    {
+        this.addScore.text = "+" + PlusScore.ToString();
+        yield return new WaitForSeconds(time);
+        this.addScore.text = "";
+    }
 
+    public void AddScore(int plusScore)
+    {
+        this.score += plusScore;
+
+        StartCoroutine(DisplayAddScoreUI(plusScore, 1f));
+
+        //StartCoroutine(DisplayAddScoreUI("sf",1, 2));
+
+        DisplayScoreUI();
+    }
     public void DisplayScoreUI()
     {
         this.scoreText.text = "Score: " + score.ToString();
     }
+
+
 
     private void DisplayCountdownTimeUI()
     {
@@ -101,8 +120,8 @@ public class EatingBehavior : MonoBehaviour
                 transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
             }
 
-            this.score += 1;
-
+            
+            AddScore(1);
             //Destroy
             DestroyBoidAfter(3f, col);
 

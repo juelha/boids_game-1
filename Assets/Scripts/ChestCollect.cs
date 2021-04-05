@@ -49,8 +49,10 @@ public class ChestCollect : MonoBehaviour
 
             //add score for chest,
             //1. chest +10, 5. chest +50
-            shark.score += pointsForOneChest * _chestsCollected;
-            shark.DisplayScoreUI();
+            shark.AddScore(pointsForOneChest * _chestsCollected);
+
+            //shark.score += pointsForOneChest * _chestsCollected;
+            //shark.DisplayScoreUI();
 
 
 
