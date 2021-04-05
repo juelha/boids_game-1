@@ -17,7 +17,7 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
     // add array of dataobjs for job to iterate over
     // public NativeArray<Boid.Data> BoidDataArray;  // why NativeArray? <-  special type of array that was designed to work optimally with jobs
 
-    public NativeArray<Vector3> velocity;  // the velocities from AccelerationJob
+   // public NativeArray<Vector3> velocity;  // the velocities from AccelerationJob
 
     public float deltaTime;
     public Vector3 vel;
@@ -31,6 +31,7 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
         //  transform.localPosition += transform.localRotation * math.float3(0, 0, 1);
 
         transform.position = vel ;// * deltaTime;
+       // transform.localPosition = vel;// * deltaTime;   
     }
 
    // public void Execute(int index) {

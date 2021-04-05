@@ -26,24 +26,24 @@ public class Boid : MonoBehaviour {
         public void Update() {  // this is where we actually do stuff!!!
             
             // limit velocity 
-            if (velocity.magnitude > maxVelocity) {
-                velocity = velocity.normalized * maxVelocity;
-            }
-            pos += velocity;// * Time.deltaTime; // move 10 units every sec
-            quat = Quaternion.LookRotation(velocity); // look in direction its going 
+          //  if (velocity.magnitude > maxVelocity) {
+            //    velocity = velocity.normalized * maxVelocity;
+         //   }
+          //  pos += velocity;// * Time.deltaTime; // move 10 units every sec
+           // quat = Quaternion.LookRotation(velocity); // look in direction its going 
            
         }
 
-        public Data(Boid boid) {
+        //public Data(Boid boid) {
 
             // init pos
-            pos = Vector3.zero;
-            quat = Quaternion.identity; 
+           // pos = Vector3.zero;
+           // quat = Quaternion.identity; 
 
             // init velocity
             // the reason why one cube is going 0/0/2
-            maxVelocity = 2;  // hardcoded for now 
-            velocity = pos * maxVelocity; // start at max speed 
+          //  maxVelocity = 2;  // hardcoded for now 
+          //  velocity = pos * maxVelocity; // start at max speed 
             
 
             // init
@@ -54,7 +54,7 @@ public class Boid : MonoBehaviour {
             // Create a list  
           //  List<Boid> BoidsList = new List<Boid>();
           //  BoidsList.Add(FindObjectOfType<Boid>());
-        }
+        //}
     }
 
 

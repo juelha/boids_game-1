@@ -24,8 +24,10 @@ public class BoidManager : MonoBehaviour {
 
     // what type???
     GameObject[] GOArray;
-    //  public List<Transform> TransformTemp;
-    public Transform[] TransformTemp;// = new Transform[100];
+    List<Transform> TransformTempList;
+
+    // DO NOT TOUCH
+    private Transform[] TransformTemp;// = new Transform[100];
 
     public BoidUpdateJob _UpdateJob;
     JobHandle UpdateJobHandle;
@@ -35,6 +37,8 @@ public class BoidManager : MonoBehaviour {
     // Spawner 
     // Start is called before the first frame update
     void Start() {
+        Transform[] TransformTemp = new Transform[number];
+
         for (int i = 0; i < number; ++i) {
 
             // anything inside of sphere is going to be a valid spawn location 
@@ -42,43 +46,43 @@ public class BoidManager : MonoBehaviour {
             // boid = new GameObject();
             //  var bla = boid.transform; 
             boids.Add(Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation));
-           //   boid = Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation);
-           // boids.Add(boid);
+           // boids.Add(Instantiate(prefab, Vector3.zero, Random.rotation));  // works!!!
 
-            Transform[] TransformTemp = new Transform[100];
+            //   boid = Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation);
+            // boids.Add(boid);
+
+            // Transform[] TransformTemp = new Transform[100];
             TransformTemp[i] = boid.transform;
+           // TransformAccessArray[i] = boid.transform;
 
         }
 
-
- 
-
-
-
-        TransformAccessArray = new TransformAccessArray(TransformTemp);
-
-
+         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        //TransformAccessArray.SetTransforms(TransformTemp);
     }
 
-   // private void Awake() {
+    // private void Awake() {
 
-        // MAKE API HERE
-        // include a boid data array based on its list of buildings from the scene
-        //                                           length = size of list, Allocator (let jobs know how long we need this list to live in memory) 
-       // _boidsDataArray = new NativeArray<Boid.Data>(boids.Count, Allocator.Persistent);  // .TempJob <- only using this list for 1 frame within a single _UpdateJob
+    // MAKE API HERE
+    // include a boid data array based on its list of buildings from the scene
+    //                                           length = size of list, Allocator (let jobs know how long we need this list to live in memory) 
+    // _boidsDataArray = new NativeArray<Boid.Data>(boids.Count, Allocator.Persistent);  // .TempJob <- only using this list for 1 frame within a single _UpdateJob
 
-        // populate the array
-       // for (var i = 0; i < boids.Count; i++) {
+    // populate the array
+    // for (var i = 0; i < boids.Count; i++) {
 
-           // _boidsDataArray[i] = boids[i];
-       // }
+    // _boidsDataArray[i] = boids[i];
+    // }
 
-        // pass it into BoidUpdateJob
-      //  _UpdateJob = new BoidUpdateJob {
+    // pass it into BoidUpdateJob
+    //  _UpdateJob = new BoidUpdateJob {
 
-        //    BoidDataArray = _boidsDataArray // PASS API HERE
-     //   };
-  //  }
+    //    BoidDataArray = _boidsDataArray // PASS API HERE
+    //   };
+    //  }
+
+    
+ 
 
     private void Update() {
         // length (number of items the _UpdateJob will iterate over)
@@ -92,25 +96,28 @@ public class BoidManager : MonoBehaviour {
         //  jobHandle.Complete();  // ensure that _UpdateJob finished its work before next frame 
 
         _UpdateJob = new BoidUpdateJob() {
-            deltaTime = Time.deltaTime,
-            velocity = Velocities,
+            deltaTime = Time.deltaTime//,
+          //  velocity = Velocities,
         };
 
 
         UpdateJobHandle = _UpdateJob.Schedule(TransformAccessArray);
+       //++
+       //UpdateJobHandle = _UpdateJob.Run(); // for debug
         //Velocities.Dispose();
-        //UpdateJobHandle.Complete();
-        //TransformAccessArray.Dispose();
-    }
-
-
-
-    public void LateUpdate() {
         UpdateJobHandle.Complete();
+     //   TransformAccessArray.Dispose();
     }
 
-    private void OnDestroy() {
- //       Velocities.Dispose();
-        TransformAccessArray.Dispose();
+
+
+   // public void LateUpdate() {
+     //   UpdateJobHandle.Complete();
+   // }
+
+   // private void OnDestroy() {
+    private void OnDisable() {
+            //       Velocities.Dispose();
+            TransformAccessArray.Dispose();
     }
 }
