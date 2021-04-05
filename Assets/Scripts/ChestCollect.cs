@@ -11,9 +11,11 @@ public class ChestCollect : MonoBehaviour
     public Transform chests;
     private int _chestsCollected = 0;
 
+    private int _chestCountAll = 0;
     // Start is called before the first frame update
     void Start()
     {
+        _chestCountAll = chests.childCount;
         DisplayChestsUI();
     }
 
@@ -25,18 +27,18 @@ public class ChestCollect : MonoBehaviour
 
     private void DisplayChestsUI()
     {
-        chest.text = "Chests: " + _chestsCollected.ToString() + " / " + chests.childCount.ToString();
+        chest.text = "Chests: " + _chestsCollected.ToString() + " / " + _chestCountAll.ToString() ;
     }
 
 
     private void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.tag == "shark")
+        if (col.gameObject.tag == "chest")
         {
             _chestsCollected += 1;
             DisplayChestsUI();
 
-            Destroy(this.gameObject);
+            Destroy(col.gameObject);
 
             
         }
