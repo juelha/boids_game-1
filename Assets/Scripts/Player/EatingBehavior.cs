@@ -11,7 +11,9 @@ public class EatingBehavior : MonoBehaviour
     private PlayerMovement player;
     //public Transform parent;
 
-    int score = 0;
+    [HideInInspector]
+    public int score = 0;
+
     public float gametime = 60f;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
@@ -71,7 +73,7 @@ public class EatingBehavior : MonoBehaviour
         }
     }
 
-    private void DisplayScoreUI()
+    public void DisplayScoreUI()
     {
         this.scoreText.text = "Score: " + score.ToString();
     }
