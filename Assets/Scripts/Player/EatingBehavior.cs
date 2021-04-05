@@ -41,10 +41,23 @@ public class EatingBehavior : MonoBehaviour
 
         // this.ShrinkShark();
 
+        if (Input.GetButton("Cancel")) // "Cancel" means Escape key
+        {
+            /*
+            if (GameState.GetState() == GameState.State.Playing)
+            {
+                GameState.TransitionTo(GameState.State.Pause);
+            }
+            else if (GameState.GetState() == GameState.State.Pause)
+            {
+                GameState.TransitionTo(GameState.State.Playing);
+            }
+            */
+        }
+
         if (this.IsGameOver())
         {
-            // TODO CHANGE GLOBAL GAME STATE HERE
-            throw new NotImplementedException("TIME IS OVER! TODO CHANGE GAME STATE");
+            GameState.TransitionTo(GameState.State.GameOver);
         }
     }
 
@@ -56,7 +69,7 @@ public class EatingBehavior : MonoBehaviour
 
     private bool IsGameOver()
     {
-        return this.gametime <= 0 || Input.GetButton("Cancel"); // "Cancel" means Escape key
+        return this.gametime <= 0;
     }
 
 

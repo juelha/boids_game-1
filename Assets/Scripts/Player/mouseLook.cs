@@ -22,6 +22,11 @@ public class mouseLook : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameState.GetState() != GameState.State.Playing)
+        {
+            return;
+        }
+
         //Camera Change
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -49,7 +54,7 @@ public class mouseLook : MonoBehaviour
         rotationVector.z = 0f;
 
         //set x rotation for natural movement
-        if(rotationVector.x < 180 && rotationVector.x > maxDegreeX)
+        if (rotationVector.x < 180 && rotationVector.x > maxDegreeX)
         {
             rotationVector.x = 45f;
         }
