@@ -28,7 +28,7 @@ public class ObjectAvoidanceBehavior : FilteredFlockBehavior
             {
                 nAvoid++;
                 //setting vector pointing away from neighbor
-                avoidanceMove += (Vector3)(agent.transform.position - item.position);
+                avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
             }
         }
 

@@ -5,6 +5,7 @@ using UnityEngine;
 public class Flock : MonoBehaviour
 {
     public FlockAgent agentPrefab;
+    //List of all agents in flock
     List<FlockAgent> agents = new List<FlockAgent>();
     public FlockBehavior behavior;
 
@@ -19,7 +20,7 @@ public class Flock : MonoBehaviour
     [Range(1f, 10f)]
     public float neighborRadius = 1.5f;
     [Range(0f, 1f)]
-    public float avoidanceRadiusMultiplier = 0.5f;
+    public float avoidanceRadiusMultiplier = 0.5f; //seperation radius = avoidanceRadiusMultiplier * neighborRadius
     [Range(0f, 10f)]
     public float obstacleAvoidanceRadius = 2f;
     [Range(0f, 10f)]
@@ -57,8 +58,8 @@ public class Flock : MonoBehaviour
                 Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f)),
                 transform
                 );
-            newAgent.name = "Agent " + i;
-            newAgent.Initialize(this);
+            newAgent.name = "Agent " + i; // not so relevant
+            newAgent.Initialize(this); //Assign boid to this flock
             agents.Add(newAgent);
         }
     }
