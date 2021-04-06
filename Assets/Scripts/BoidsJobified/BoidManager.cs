@@ -15,23 +15,32 @@ public class BoidManager : MonoBehaviour {
 
     public float radius;
     public int number;
+    public float maxVelocity;
 
     //
     //NativeArray<Transform> Velocities;
     TransformAccessArray TransformAccessArray;
-    TransformAccessArray BoidsTransformArray;
+  //  TransformAccessArray BoidsTransformArray;  // to iterate over boids (nested for loop)
+   // NativeArray<Transform> BoidsPositionArray;
+    [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+
+    NativeArray<Vector3> VelocitiesArray; // saving vel here not in Boid.cs
 
     // DO NOT TOUCH
     // private Transform[] TransformTemp;// = new Transform[100];
 
     public BoidUpdateJob UpdateJob;
-    public BoidRulesJob RulesJob;
+    public BoidAlignmentJob AlignmentJob;
     JobHandle UpdateJobHandle;
-    JobHandle RulesJobHandle;
+    JobHandle AlignmentJobHandle;
 
 
     void Start() {
         Transform[] TransformTemp = new Transform[number];
+       // NativeArray<Vector3> BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
+       // NativeArray<Vector3> VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
+        BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
+        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
 
         for (int i = 0; i < number; ++i) {
 
@@ -39,10 +48,12 @@ public class BoidManager : MonoBehaviour {
          
             var obj = boids[i];
             TransformTemp[i] = obj.transform;
+            BoidsPositionArray[i] = obj.transform.position;
+            VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
-        BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
+        //BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
     }
 
    
@@ -51,27 +62,42 @@ public class BoidManager : MonoBehaviour {
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // new job-----------------------------------------------------------
-        UpdateJob = new BoidUpdateJob() {
-            deltaTime = Time.deltaTime
+        AlignmentJob = new BoidAlignmentJob() {
+            deltaTime = Time.deltaTime,
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
         };
 
-        RulesJob = new BoidRulesJob() {
+        UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
-            BoidsTransformArray = BoidsTransformArray,
+            velocity = VelocitiesArray,
         };
 
         // Schedule--------------------------------------------------------
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray);
-        RulesJobHandle = RulesJob.Schedule(TransformAccessArray);
+        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
+
+
+
+        // update gets called in the end and uses the changed velocities to move obj with transform
+        // combine all dependencies: 
+      //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
+
+        // Populate `handles` with `JobHandles` from multiple scheduled jobs...
+        
+     //   JobHandle jh = JobHandle.CombineDependencies(handles);
+
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, AlignmentJobHandle);
 
         // Complete--------------------------------------------------------
+        AlignmentJobHandle.Complete();
         UpdateJobHandle.Complete();
-        RulesJobHandle.Complete();
     }
 
-
-    private void OnDisable() {
-            TransformAccessArray.Dispose();
-        BoidsTransformArray.Dispose(); 
+     private void OnDestroy() {
+    //private void OnDisable() {
+        
+        BoidsPositionArray.Dispose();
+        VelocitiesArray.Dispose();
+        TransformAccessArray.Dispose();
     }
 }

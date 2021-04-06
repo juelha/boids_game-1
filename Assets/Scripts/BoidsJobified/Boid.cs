@@ -17,8 +17,8 @@ public class Boid : MonoBehaviour {
         public Quaternion quat;
         public float maxVelocity;
 
-        // needed to change velocity in JOBS
-        /* public Vector3 velocity {
+        // needed to change vel in JOBS
+        /* public Vector3 vel {
              get { return _velocity; }
              set { _velocity = value; }
          } */
