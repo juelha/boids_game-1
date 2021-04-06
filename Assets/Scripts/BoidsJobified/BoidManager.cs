@@ -31,8 +31,11 @@ public class BoidManager : MonoBehaviour {
 
     public BoidUpdateJob UpdateJob;
     public BoidAlignmentJob AlignmentJob;
+    public BoidCohesionJob CohesionJob;
+
     JobHandle UpdateJobHandle;
     JobHandle AlignmentJobHandle;
+    JobHandle CohesionJobHandle;
 
 
     void Start() {
@@ -68,6 +71,12 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
         };
 
+        CohesionJob = new BoidCohesionJob() {
+            deltaTime = Time.deltaTime,
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
+
         UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
             velocity = VelocitiesArray,
@@ -75,21 +84,24 @@ public class BoidManager : MonoBehaviour {
 
         // Schedule--------------------------------------------------------
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
+        CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
 
 
 
         // update gets called in the end and uses the changed velocities to move obj with transform
         // combine all dependencies: 
-      //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
+        //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
 
         // Populate `handles` with `JobHandles` from multiple scheduled jobs...
-        
-     //   JobHandle jh = JobHandle.CombineDependencies(handles);
 
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, AlignmentJobHandle);
+        //   JobHandle jh = JobHandle.CombineDependencies(handles);
+
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, CohesionJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
+        CohesionJobHandle.Complete();
+
         UpdateJobHandle.Complete();
     }
 

@@ -1,17 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Burst;
-using UnityEngine;
 using UnityEngine.Jobs;
-using Unity.Mathematics;
-using Unity.Jobs;
 using Unity.Collections;
-
-using Unity.Burst;
-using UnityEngine;
-using UnityEngine.Jobs;
-using Unity.Mathematics;
+using Unity.Collections.LowLevel.Unsafe;
 
 
 
@@ -23,9 +14,13 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
     //public sth  BoidsList;
     public float radius;
    // public TransformAccessArray BoidsTransformArray;
-    [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
 
+    [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+    
     public NativeArray<Vector3> velocity;
+
+    [NativeSetThreadIndex]
+    private int m_ThreadIndex;  // need another index inside job for nested for loop
 
     public void Execute(int i, TransformAccess transform) {
 
@@ -39,10 +34,13 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
 
         var average_alignment = Vector3.zero;
         var found = 0;
+        radius = 5; // change here
+
 
         // loops over all transforms 
-        for (int j = 0; j < 100; j++) {     //S HARCODED HERE 
+        for (int j = 0; j < BoidsPositionArray.Length; j++) {     //S HARCODED HERE 
 
+     //   for (m_ThreadIndex = 0; m_ThreadIndex < BoidsPositionArray.Length; m_ThreadIndex++) {
             var curTransform = BoidsPositionArray[j]; 
             var diff = curTransform - transform.position;
             if ((diff.magnitude < radius) && (diff.magnitude > 0)) { // checks if in radius && not itself
@@ -52,11 +50,15 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
 
                 //  average_alignment += curBoid.GetVelocity();
                 // prob bug here -> get boid from transfrom, boid than has Vel 
-                average_alignment += velocity[j];
+              //  var curVelocity = velocity[j];
+                var curVelocity = BoidsPositionArray[j];
+
+                average_alignment += curVelocity;
                 found += 1;
 
 
             }
+
         }
 
 
@@ -71,7 +73,8 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
             // set vel here
 
             //boid.vel += Vector3.Lerp(boid.vel, average_alignment, Time.deltaTime); // gets closer to vel we want to achieve
-        } 
+        }
+        
 
         // reset
         found = 0;
