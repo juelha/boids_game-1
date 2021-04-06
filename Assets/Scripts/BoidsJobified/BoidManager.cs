@@ -9,20 +9,25 @@ public class BoidManager : MonoBehaviour {
 
 
     public List<GameObject> boids;
+
+
     public GameObject prefab;
 
     public float radius;
     public int number;
 
     //
-    NativeArray<Vector3> Velocities;
+    //NativeArray<Transform> Velocities;
     TransformAccessArray TransformAccessArray;
+    TransformAccessArray BoidsTransformArray;
 
     // DO NOT TOUCH
-    private Transform[] TransformTemp;// = new Transform[100];
+    // private Transform[] TransformTemp;// = new Transform[100];
 
-    public BoidUpdateJob _UpdateJob;
+    public BoidUpdateJob UpdateJob;
+    public BoidRulesJob RulesJob;
     JobHandle UpdateJobHandle;
+    JobHandle RulesJobHandle;
 
 
     void Start() {
@@ -36,21 +41,37 @@ public class BoidManager : MonoBehaviour {
             TransformTemp[i] = obj.transform;
         }
 
-         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
     }
 
    
     private void Update() {
-        _UpdateJob = new BoidUpdateJob() {
+
+        // create list of jobhandles and use complete all (see vid code monkey 9min) 
+
+        // new job-----------------------------------------------------------
+        UpdateJob = new BoidUpdateJob() {
             deltaTime = Time.deltaTime
         };
 
-        UpdateJobHandle = _UpdateJob.Schedule(TransformAccessArray);
+        RulesJob = new BoidRulesJob() {
+            deltaTime = Time.deltaTime,
+            BoidsTransformArray = BoidsTransformArray,
+        };
+
+        // Schedule--------------------------------------------------------
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray);
+        RulesJobHandle = RulesJob.Schedule(TransformAccessArray);
+
+        // Complete--------------------------------------------------------
         UpdateJobHandle.Complete();
+        RulesJobHandle.Complete();
     }
 
 
     private void OnDisable() {
             TransformAccessArray.Dispose();
+        BoidsTransformArray.Dispose(); 
     }
 }

@@ -13,7 +13,8 @@ using Unity.Mathematics;
 public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
 
     public float deltaTime;
-    public Vector3 vel;
+   // public TransformAccessArray BoidsTransformArray; 
+    public Vector3 vel;  // = move
     
     public void Execute(int i, TransformAccess transform) {
 
