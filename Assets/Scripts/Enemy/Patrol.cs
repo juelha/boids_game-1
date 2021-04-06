@@ -49,9 +49,20 @@ public class Patrol : MonoBehaviour
     private void move()
     {
 
-        //Move Enemy in direction of next Node
-        Vector3 dir = _goal.position - transform.position;
+        // Determine which direction to rotate towards
+        Vector3 targetDirection = _goal.position - transform.position;
 
-        transform.position += dir.normalized * speed * Time.deltaTime;
+        // The step size is equal to speed times frame time.
+        float singleStep = speed * Time.deltaTime;
+
+        //move
+        transform.position += targetDirection.normalized * singleStep;
+
+
+        // Rotate the forward vector towards the target direction by one step
+        Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
+
+        // Calculate a rotation a step closer to the target and applies rotation to this object
+        transform.rotation = Quaternion.LookRotation(newDirection);
     }
 }
