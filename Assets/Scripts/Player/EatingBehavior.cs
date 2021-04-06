@@ -17,6 +17,8 @@ public class EatingBehavior : MonoBehaviour
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
 
+    public bool scaling = false;
+
     public float maxSize = 50f;
     public float minSize = 3f;
     public float increaseSize = 0.1f;
@@ -93,12 +95,14 @@ public class EatingBehavior : MonoBehaviour
         if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
             //Increase shark, when he eats fish, but with maximum size
-            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
-            if (transform.localScale.x > maxSize)
+            if (scaling)
             {
-                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+                transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+                if (transform.localScale.x > maxSize)
+                {
+                    transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+                }
             }
-
             this.score += 1;
 
             //Destroy

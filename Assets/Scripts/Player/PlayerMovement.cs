@@ -4,22 +4,24 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController controller;
+    //public CharacterController controller;
     public float speed = 3f;
     public float slowDownFor = 3f;
     public float speedUpFor = 3f;
     public float waitForNextSpeed = 5f;
     private bool isFast = false;
+
+    private Rigidbody rb;
     // Start is called before the first frame update
     //public float sensibility;
 
     void Start()
     {
-
+        rb = this.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         //float midPoint = (transform.position - Camera.main.transform.position).magnitude * 0.5f;
@@ -33,9 +35,11 @@ public class PlayerMovement : MonoBehaviour
         //verhindern, dass er rückwärts kann
         if (z < 0) z = 0;
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        //slower left and right
+        Vector3 move = rb.transform.right * x / 3 + rb.transform.forward * z;
 
-        controller.Move(move * speed * Time.deltaTime);
+        //controller.Move(move * speed * Time.deltaTime);
+        rb.AddForce(move * speed * Time.deltaTime, ForceMode.VelocityChange);
 
         // check for upper boundary (water surface, currently at y = 8.5)
         if (transform.position.y > 7.9f)
@@ -71,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
+
     //Slow down function
     IEnumerator slowDownTime(float time)
     {
@@ -85,6 +90,5 @@ public class PlayerMovement : MonoBehaviour
         StartCoroutine(slowDownTime(slowDownFor));
 
     }
-
 
 }
