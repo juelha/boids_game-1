@@ -23,7 +23,7 @@ public class HealthSystem : MonoBehaviour
 
         if (!this.IsAlive())
         {
-            this.ChangeGameState();
+            GameState.Transition(GameState.Event.FinishGame);
         }
     }
 
@@ -41,11 +41,5 @@ public class HealthSystem : MonoBehaviour
             healthBarUIPoints = this.healthPoints / this.MAX_HEALTH_POINTS;
         }
         this.healthBar.transform.localScale = new Vector3(healthBarUIPoints, 1, 1);
-    }
-
-    private void ChangeGameState()
-    {
-        // TODO CHANGE GLOBAL GAME STATE HERE
-        throw new NotImplementedException("YOU ARE DEAD! TODO CHANGE GLOBAL GAME STATE HERE");
     }
 }
