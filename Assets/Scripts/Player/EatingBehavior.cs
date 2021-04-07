@@ -16,11 +16,10 @@ public class EatingBehavior : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
-<<<<<<< HEAD
+
 
     public bool scaling = false;
-=======
->>>>>>> parent of 7287753 (Highscore system)
+
 
     public float maxSize = 50f;
     public float minSize = 3f;
@@ -76,10 +75,28 @@ public class EatingBehavior : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
-    private void DisplayScoreUI()
-=======
->>>>>>> parent of 7287753 (Highscore system)
+
+
+
+    //shows sth for x secs
+    IEnumerator DisplayAddScoreUI(int PlusScore,  float time)
+    {
+        this.addScore.text = "+" + PlusScore.ToString();
+        yield return new WaitForSeconds(time);
+        this.addScore.text = "";
+    }
+
+    //Adds some points to your score
+    public void AddScore(int plusScore)
+    {
+        this.score += plusScore;
+
+        //shows your benefit for 3 secs
+        StartCoroutine(DisplayAddScoreUI(plusScore, 3f));
+        DisplayScoreUI();
+    }
+    public void DisplayScoreUI()
+
     {
         this.scoreText.text = "Score: " + score.ToString();
     }
