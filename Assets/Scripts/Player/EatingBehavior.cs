@@ -16,11 +16,8 @@ public class EatingBehavior : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
-<<<<<<< HEAD
 
     public bool scaling = false;
-=======
->>>>>>> parent of 7287753 (Highscore system)
 
     public float maxSize = 50f;
     public float minSize = 3f;
@@ -76,10 +73,7 @@ public class EatingBehavior : MonoBehaviour
         }
     }
 
-<<<<<<< HEAD
     private void DisplayScoreUI()
-=======
->>>>>>> parent of 7287753 (Highscore system)
     {
         this.scoreText.text = "Score: " + score.ToString();
     }
