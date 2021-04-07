@@ -54,7 +54,7 @@ public struct BoidCohesionJob : IJobParallelForTransform {  // IJobParallelFor c
 
             average_cohesion = average_cohesion / found;
             velocity[i] += average_cohesion;
-            velocity[i] = velocity[i] * 5;
+           // velocity[i] = velocity[i] * 5;
             // transform.position += vel * deltaTime;
 
             // set vel here

@@ -24,7 +24,7 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
     
     public void Execute(int i, TransformAccess transform) {
 
-        maxVelocity = 2; 
+        maxVelocity = 5; 
 
         //  transform.localPosition += transform.localRotation * math.float3(0, 0, 1);
 
