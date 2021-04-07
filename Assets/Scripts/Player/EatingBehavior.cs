@@ -41,10 +41,14 @@ public class EatingBehavior : MonoBehaviour
 
         // this.ShrinkShark();
 
+        if (Input.GetKeyDown(KeyCode.P) || Input.GetButton("Cancel")) // "Cancel" means Escape key
+        {
+            GameState.Transition(GameState.Event.TogglePause);
+        }
+
         if (this.IsGameOver())
         {
-            // TODO CHANGE GLOBAL GAME STATE HERE
-            throw new NotImplementedException("TIME IS OVER! TODO CHANGE GAME STATE");
+            GameState.Transition(GameState.Event.FinishGame);
         }
     }
 
@@ -56,7 +60,7 @@ public class EatingBehavior : MonoBehaviour
 
     private bool IsGameOver()
     {
-        return this.gametime <= 0 || Input.GetButton("Cancel"); // "Cancel" means Escape key
+        return this.gametime <= 0;
     }
 
 
