@@ -35,8 +35,9 @@ public class ChestCollect : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter(Collision col)
+    private void OnTriggerEnter(Collider col)
     {
+        //Debug.Log("Hit");
         if (col.gameObject.tag == "chest")
         {
             _chestsCollected += 1;
@@ -50,6 +51,7 @@ public class ChestCollect : MonoBehaviour
             //add score for chest,
             //1. chest +10, 5. chest +50
             shark.AddScore(pointsForOneChest * _chestsCollected);
+
 
             //shark.score += pointsForOneChest * _chestsCollected;
             //shark.DisplayScoreUI();
