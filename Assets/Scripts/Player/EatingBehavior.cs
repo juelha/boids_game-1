@@ -11,11 +11,15 @@ public class EatingBehavior : MonoBehaviour
     private PlayerMovement player;
     //public Transform parent;
 
-    int score = 0;
+    [HideInInspector]
+    public int score = 0;
+
     public float gametime = 60f;
+    public TextMeshProUGUI addScore;
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI countdownTimeText;
     public TextMeshProUGUI speed;
+    public TextMeshProUGUI highScore;
 
     public bool scaling = false;
 
@@ -30,6 +34,7 @@ public class EatingBehavior : MonoBehaviour
     void Start()
     {
         this.score = 0;
+        this.highScore.text = "HighScore: " + PlayerPrefs.GetInt("HighScore", 0);
     }
 
     // Update is called once per frame
@@ -73,10 +78,38 @@ public class EatingBehavior : MonoBehaviour
         }
     }
 
-    private void DisplayScoreUI()
+    //shows sth for x secs
+    IEnumerator DisplayAddScoreUI(int PlusScore, float time)
+    {
+        this.addScore.text = "+" + PlusScore.ToString();
+        yield return new WaitForSeconds(time);
+        this.addScore.text = "";
+    }
+
+    private void HighScore()
+    {
+        if (this.score > PlayerPrefs.GetInt("HighScore", 0))
+        {
+            PlayerPrefs.SetInt("HighScore", this.score);
+            highScore.text = "HighScore: " + this.score.ToString();
+        }
+    }
+    //Adds some points to your score
+    public void AddScore(int plusScore)
+    {
+        this.score += plusScore;
+
+        HighScore();
+        //shows your benefit for 3 secs
+        StartCoroutine(DisplayAddScoreUI(plusScore, 3f));
+        DisplayScoreUI();
+    }
+    public void DisplayScoreUI()
     {
         this.scoreText.text = "Score: " + score.ToString();
     }
+
+
 
     private void DisplayCountdownTimeUI()
     {
@@ -114,7 +147,7 @@ public class EatingBehavior : MonoBehaviour
     //
     //slow down when eat fish
     // player.slowDown();
-        //}
+    //}
     //}
     private void OnTriggerEnter(Collider col)
     //private void OnTriggerEnter(Collider col)
@@ -134,11 +167,12 @@ public class EatingBehavior : MonoBehaviour
                     transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
                 }
             }
-            this.score += 1;
-    
+
+
+            AddScore(1);
             //Destroy
             DestroyBoidAfter(3f, col);
-    
+
             //slow down when eat fish
             // player.slowDown();
         }
