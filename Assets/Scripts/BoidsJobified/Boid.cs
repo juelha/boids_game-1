@@ -6,11 +6,23 @@ public class Boid : MonoBehaviour {
     [SerializeField] public float separationRadius;
     [SerializeField] public float radius;
 
-    
+    Collider agentCollider;
+    public Collider AgentCollider { get { return agentCollider; } }
 
+    // Start is called before the first frame update
+    void Start() {
+        agentCollider = GetComponent<Collider>();
+    }
+
+    public void Update() {  // this is where we actually do stuff!!!
+
+
+    }
 
     //  jobs doesnt support strongly typed classes ->  encapsulate the code we want to jobify into a struct
     public struct encapsulatedData {
+
+
 
         public Vector3 _velocity;
         public Vector3 pos;

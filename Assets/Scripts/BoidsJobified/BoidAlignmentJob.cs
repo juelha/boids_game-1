@@ -41,8 +41,8 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
         for (int j = 0; j < BoidsPositionArray.Length; j++) {     //S HARCODED HERE 
 
      //   for (m_ThreadIndex = 0; m_ThreadIndex < BoidsPositionArray.Length; m_ThreadIndex++) {
-            var curTransform = BoidsPositionArray[j]; 
-            var diff = curTransform - transform.position;
+            var curPosition = BoidsPositionArray[j]; 
+            var diff = curPosition - transform.position;
             if ((diff.magnitude < radius) && (diff.magnitude > 0)) { // checks if in radius && not itself
 
                 // Boid curBoid = curTransform.GetComponent<Boid>();  // gets boid from transform

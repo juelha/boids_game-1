@@ -20,9 +20,10 @@ public class BoidManager : MonoBehaviour {
     //
     //NativeArray<Transform> Velocities;
     TransformAccessArray TransformAccessArray;
-  //  TransformAccessArray BoidsTransformArray;  // to iterate over boids (nested for loop)
-   // NativeArray<Transform> BoidsPositionArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+
+    public List<Collider> contextColliders;
+   // [ReadOnly] public NativeArray<Collision> BoidsCollisionArray;
 
     NativeArray<Vector3> VelocitiesArray; // saving vel here not in Boid.cs
 
