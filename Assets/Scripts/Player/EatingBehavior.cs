@@ -89,9 +89,40 @@ public class EatingBehavior : MonoBehaviour
         this.speed.text = player.speed.ToString("F2");
     }
 
-    private void OnCollisionEnter(Collision col)
+    //private void OnCollisionEnter(Collision col)
+    ////private void OnTriggerEnter(Collider col)
+    //{
+    //    Debug.Log("collision");
+    //    Debug.Log(col.gameObject.tag);
+    //    Debug.Log(col.gameObject);
+    //    Debug.Log("Tag Collider" + col.collider.gameObject.tag);
+    //    if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
+    //    {
+    //        //Increase shark, when he eats fish, but with maximum size
+    //        if (scaling)
+    //        {
+    //            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+    //            if (transform.localScale.x > maxSize)
+    //            {
+    //                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+    //            }
+    //        }
+    //        this.score += 1;
+    //
+    //        //Destroy
+    //        DestroyBoidAfter(3f, col);
+    //
+    //slow down when eat fish
+    // player.slowDown();
+        //}
+    //}
+    private void OnTriggerEnter(Collider col)
     //private void OnTriggerEnter(Collider col)
     {
+        Debug.Log("collision");
+        Debug.Log(col.gameObject.tag);
+        Debug.Log(col.gameObject);
+        //Debug.Log("Tag Collider" + gameObject.tag);
         if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
             //Increase shark, when he eats fish, but with maximum size
@@ -104,15 +135,16 @@ public class EatingBehavior : MonoBehaviour
                 }
             }
             this.score += 1;
-
+    
             //Destroy
             DestroyBoidAfter(3f, col);
-
+    
             //slow down when eat fish
             // player.slowDown();
         }
     }
-    private void DestroyBoidAfter(float time, Collision coll)
+
+    private void DestroyBoidAfter(float time, Collider coll)
     {
         //Highlight boid
         Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
