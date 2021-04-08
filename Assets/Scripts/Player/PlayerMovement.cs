@@ -4,15 +4,26 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController controller;
+    //public CharacterController controller;
     public float speed = 3f;
     public float slowDownFor = 3f;
     public float speedUpFor = 3f;
     public float waitForNextSpeed = 5f;
     private bool isFast = false;
 
+
+    private Rigidbody rb;
+    // Start is called before the first frame update
+    //public float sensibility;
+
+    void Start()
+    {
+        rb = this.GetComponent<Rigidbody>();
+    }
+
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (GameState.GetState() != GameState.State.Playing)
         {
@@ -28,9 +39,11 @@ public class PlayerMovement : MonoBehaviour
         // if movement would be directed backwards (negative z), player can't move in that direction
         if (z < 0) z = 0;
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        //slower left and right
+        Vector3 move = rb.transform.right * x / 3 + rb.transform.forward * z;
 
-        controller.Move(move * speed * Time.deltaTime);
+        //controller.Move(move * speed * Time.deltaTime);
+        rb.AddForce(move * speed * Time.deltaTime, ForceMode.VelocityChange);
 
         // check for upper boundary (water surface, currently at y = 8.5)
         // because the distance btw surface and shark is measured from the midpoint of the shark model
@@ -67,6 +80,7 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(wait);
         isFast = false;
     }
+
 
     //Slow down function
     IEnumerator slowDownTime(float time)

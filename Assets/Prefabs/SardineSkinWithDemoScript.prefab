@@ -1107,12 +1107,12 @@ GameObject:
   - component: {fileID: 9588582}
   - component: {fileID: 8204896}
   - component: {fileID: 8233152}
-  - component: {fileID: 6376761787255140782}
   - component: {fileID: -5798609811339555259}
   - component: {fileID: -2271276813223375219}
   - component: {fileID: 8788631064115011156}
   - component: {fileID: 5659180082036959644}
   - component: {fileID: 9074381573126472110}
+  - component: {fileID: 2940065658012245811}
   m_Layer: 0
   m_Name: SardineSkinWithDemoScript
   m_TagString: Boid
@@ -1347,19 +1347,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!135 &6376761787255140782
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 159700}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-5798609811339555259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1373,7 +1360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocity: {x: 1, y: 1, z: 0}
-  maxVelocity: 5
+  maxVelocity: 4
 --- !u!114 &-2271276813223375219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1428,6 +1415,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 0.5
   repulsionForce: 1
+--- !u!65 &2940065658012245811
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 159700}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.2, y: 0.1, z: 0.5}
+  m_Center: {x: 0, y: 0.05, z: -0.05}
 --- !u!1 &160698
 GameObject:
   m_ObjectHideFlags: 0
