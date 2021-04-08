@@ -28,6 +28,9 @@ public class EatingBehavior : MonoBehaviour
     public float increaseSize = 0.1f;
     public float decreaseSize = 0.0001f;
 
+    //audio
+    private AudioSource[] mysounds;
+
     //Immer nur einen auf einmal
     //private bool amFressen = false;
     // Start is called before the first frame update
