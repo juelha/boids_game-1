@@ -1,18 +1,34 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
 public class Boid : MonoBehaviour {
     
     // everything we want to change in editor:
     [SerializeField] public float separationRadius;
     [SerializeField] public float radius;
+    [SerializeField] public float neighborRadius;
 
-    Collider agentCollider;
-    public Collider AgentCollider { get { return agentCollider; } }
+    public Vector3 velocity;
+    public Vector3 pos;
+    public Quaternion quat;
+    public float maxVelocity;
+
+    Collider boidCollider;
+    public Collider getboidCollider { get { return boidCollider; } }
 
     // Start is called before the first frame update
     void Start() {
-        agentCollider = GetComponent<Collider>();
+        boidCollider = GetComponent<Collider>();
     }
+
+    public static Boid boid;
+
+    void Awake() {
+        boid = this;
+    }
+
+    
+
 
     public void Update() {  // this is where we actually do stuff!!!
 
