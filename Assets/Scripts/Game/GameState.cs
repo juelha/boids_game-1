@@ -88,7 +88,7 @@ public class GameState : MonoBehaviour
 
     private static void LoadFirstLevel()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("Felix Boids Scene");
     }
 
     private static void LoadMainMenu()
@@ -113,7 +113,7 @@ public class GameState : MonoBehaviour
 
         string SCENE_LOADED_VIA_EDITOR = "4";
 
-        if (scene.name == "SampleScene"
+        if (scene.name == "FelixBoidsScene"
             && Application.isEditor
             && mode.ToString() == SCENE_LOADED_VIA_EDITOR)
         {

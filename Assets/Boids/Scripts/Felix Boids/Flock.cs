@@ -5,6 +5,10 @@ using UnityEngine;
 public class Flock : MonoBehaviour
 {
     public FlockAgent agentPrefab;
+
+    public FlockAgent xtrapointsBoid;
+
+    public FlockAgent xtratimeBoid;
     //List of all agents in flock
     List<FlockAgent> agents = new List<FlockAgent>();
     public FlockBehavior behavior;
@@ -13,7 +17,10 @@ public class Flock : MonoBehaviour
     [Range(10, 500)]
     public int startingCount = 250;
     const float AgentDensity = 0.08f;
-
+    [Range(1, 20)]
+    public int number_of_xtra_points_boids = 5;
+    [Range(1, 20)]
+    public int number_of_xtra_time_boids = 5;
     [Range(1f, 100f)]
     public float driveFactor = 10f;
     [Range(1f, 100f)]
@@ -64,6 +71,46 @@ public class Flock : MonoBehaviour
             agents.Add(newAgent);
            
         }
+        if(xtrapointsBoid != null)
+        {
+            //instatiation of the flock, determining the number of boids in the starting count
+            for (int i = 0; i < number_of_xtra_points_boids; i++)
+            {
+                FlockAgent newAgent = Instantiate(
+                    xtrapointsBoid,
+                    //insideUnitSphere returns random point within a sphere of radius 1, used for setting starting point
+                    // AgentDensity determines how far they start away from each other
+                    Random.insideUnitSphere * startingCount * AgentDensity,
+                    //setting a random rotation
+                    Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f)),
+                    transform
+                    );
+                newAgent.name = "XtraPointsBoid " + i; // not so relevant
+                newAgent.Initialize(this); //Assign boid to this flock
+                agents.Add(newAgent);
+
+            }
+        }
+        if (xtratimeBoid != null)
+        {
+            for (int i = 0; i < number_of_xtra_time_boids; i++)
+            {
+                FlockAgent newAgent = Instantiate(
+                    xtratimeBoid,
+                    //insideUnitSphere returns random point within a sphere of radius 1, used for setting starting point
+                    // AgentDensity determines how far they start away from each other
+                    Random.insideUnitSphere * startingCount * AgentDensity,
+                    //setting a random rotation
+                    Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f)),
+                    transform
+                    );
+                newAgent.name = "XtraTimeBoid " + i; // not so relevant
+                newAgent.Initialize(this); //Assign boid to this flock
+                agents.Add(newAgent);
+
+            }
+        }
+
     }
 
     // Update is called once per frame

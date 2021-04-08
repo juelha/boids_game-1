@@ -111,6 +111,39 @@ public class EatingBehavior : MonoBehaviour
             //slow down when eat fish
             // player.slowDown();
         }
+
+        if (col.gameObject.tag == "XtraPointsBoid") 
+        {
+            //Increase shark, when he eats fish, but with maximum size
+            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+            if (transform.localScale.x > maxSize)
+            {
+                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+            }
+
+            this.score += 5;
+
+            //Destroy
+            DestroyBoidAfter(3f, col);
+        }
+
+        if (col.gameObject.tag == "XtraTimeBoid")
+        {
+            //Increase shark, when he eats fish, but with maximum size
+            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+            if (transform.localScale.x > maxSize)
+            {
+                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+            }
+
+            this.score += 1;
+            gametime += 10f;
+
+            //Destroy
+            DestroyBoidAfter(3f, col);
+
+
+        }
     }
     private void DestroyBoidAfter(float time, Collision coll)
     {
