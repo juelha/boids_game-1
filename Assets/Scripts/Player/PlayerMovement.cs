@@ -10,13 +10,6 @@ public class PlayerMovement : MonoBehaviour
     public float speedUpFor = 3f;
     public float waitForNextSpeed = 5f;
     private bool isFast = false;
-    // Start is called before the first frame update
-    //public float sensibility;
-
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()
@@ -27,14 +20,12 @@ public class PlayerMovement : MonoBehaviour
         }
         //Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         //float midPoint = (transform.position - Camera.main.transform.position).magnitude * 0.5f;
-        //
         //transform.LookAt(mouseRay.origin * sensibility  + mouseRay.direction * midPoint);
-
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        //verhindern, dass er rückwärts kann
+        // if movement would be directed backwards (negative z), player can't move in that direction
         if (z < 0) z = 0;
 
         Vector3 move = transform.right * x + transform.forward * z;
@@ -42,13 +33,19 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(move * speed * Time.deltaTime);
 
         // check for upper boundary (water surface, currently at y = 8.5)
-        if (transform.position.y > 7.9f)
+        // because the distance btw surface and shark is measured from the midpoint of the shark model
+        // the shark has to be stopped before the y surface level
+        // in addition we want the third person camera to always be underwater, so the shark has to stay below
+        // the point where the third person player camera (main camera) would breach the surface
+        // test showed: if the camera is directly above the shark through rotation
+        // and the shark is at y = 6.9 or below the main camera is still underwater
+        if (transform.position.y > 6.9f)
         {
-            // keep player position at 8.4
-            transform.position = new Vector3(transform.position.x, 7.9f, transform.position.z);
+            // keep player below threshold 
+            transform.position = new Vector3(transform.position.x, 6.9f, transform.position.z);
         }
 
-        //If u press space, speed up
+        //If player presses "space", shark get's a speed up (calls f speedUp() )
         if (Input.GetButton("Jump") && !isFast)
         {
             speedUp();
@@ -58,7 +55,6 @@ public class PlayerMovement : MonoBehaviour
     //Speed up
     public void speedUp()
     {
-
         StartCoroutine(speedUpTime(speedUpFor, waitForNextSpeed));
     }
 
@@ -70,10 +66,7 @@ public class PlayerMovement : MonoBehaviour
         speed /= 2;
         yield return new WaitForSeconds(wait);
         isFast = false;
-
-
     }
-
 
     //Slow down function
     IEnumerator slowDownTime(float time)
@@ -87,8 +80,6 @@ public class PlayerMovement : MonoBehaviour
     public void slowDown()
     {
         StartCoroutine(slowDownTime(slowDownFor));
-
     }
-
 
 }
