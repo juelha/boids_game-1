@@ -7,7 +7,7 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
 
     Boid boid;
     int radiusAvoidObstacle;
-    List<Transform> context;
+    List<Transform> nearbyTransforms;
 
     // Update is called once per frame
     void Update() {
@@ -17,7 +17,7 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
         int nAvoid = 0;
        
 
-        foreach (Transform obstacleTransform in context) {
+        foreach (Transform obstacleTransform in nearbyTransforms) {
 
             Collider obstacleCollider = obstacleTransform.GetComponent<Collider>();
             //get nearest point of the collider of the obstacle

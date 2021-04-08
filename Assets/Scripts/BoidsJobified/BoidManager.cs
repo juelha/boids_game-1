@@ -23,7 +23,8 @@ public class BoidManager : MonoBehaviour {
     TransformAccessArray TransformAccessArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
 
-    public List<Collider> contextColliders;
+    //public List<Collider> contextColliders;
+    List<Transform> nearbyTransforms;
    // [ReadOnly] public NativeArray<Collision> BoidsCollisionArray;
 
     NativeArray<Vector3> VelocitiesArray; // saving vel here not in Boid.cs
@@ -59,11 +60,13 @@ public class BoidManager : MonoBehaviour {
 
             BoidsPositionArray[i] = obj.transform.position;
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
-            List<Transform> context = GetNearbyObjects(obj);
+            List<Transform> nearbyTransforms = GetNearbyObjects(obj);
 
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        
+        
         //BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
     }
 
