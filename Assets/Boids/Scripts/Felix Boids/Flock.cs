@@ -71,33 +71,40 @@ public class Flock : MonoBehaviour
     {   // agents = list of agents
         foreach (FlockAgent agent in agents)
         {
-            List<Transform> context = GetNearbyObjects(agent);
-
-            //call calculateMove funcion from class behavior to get directional vector
-            Vector3 move = behavior.CalculateMove(agent, context, this);
-            move *= driveFactor;
-            //restricting speed to maxSpeed
-            if (move.sqrMagnitude > squareMaxSpeed)
+            if (agent != null)
             {
-                move = move.normalized * maxSpeed;
+                List<Transform> context = GetNearbyObjects(agent);
+
+                //call calculateMove funcion from class behavior to get directional vector
+                Vector3 move = behavior.CalculateMove(agent, context, this);
+                move *= driveFactor;
+                //restricting speed to maxSpeed
+                if (move.sqrMagnitude > squareMaxSpeed)
+                {
+                    move = move.normalized * maxSpeed;
+                }
+                agent.Move(move);
             }
-            agent.Move(move);
         }
     }
 
     List<Transform> GetNearbyObjects(FlockAgent agent)
     {
         List<Transform> context = new List<Transform>();
-        //instancing a array of colliders ´which entails every collider in a given radius (-> neighborRadius)
-        Collider[] contextColliders = Physics.OverlapSphere(agent.transform.position, neighborRadius);
-        // sorting out own collider and putting rest in list context
-        foreach (Collider c in contextColliders)
+        if(agent != null)
         {
-            if (c != agent.AgentCollider)
+            //instancing a array of colliders ´which entails every collider in a given radius (-> neighborRadius)
+            Collider[] contextColliders = Physics.OverlapSphere(agent.transform.position, neighborRadius);
+            // sorting out own collider and putting rest in list context
+            foreach (Collider c in contextColliders)
             {
-                context.Add(c.transform);   
-            }
+                if (c != agent.AgentCollider)
+                {
+                    context.Add(c.transform);   
+                }
          
+            }
+           
         }
         return context;
     }
