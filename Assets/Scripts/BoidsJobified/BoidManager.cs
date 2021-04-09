@@ -37,9 +37,9 @@ public class BoidManager : MonoBehaviour {
     public NativeArray<RaycastCommand> raycastCommandsArray;
     public NativeArray<RaycastHit> raycastHitsArray;
 
-    // for managing raycast results -> TODO: delete one of them
-    NativeArray<Vector3> hitNormals;
-    NativeArray<bool> isHitObstacles; 
+    // for managing raycast results -> TODO: 
+    public NativeArray<Vector3> hitNormals;
+    public NativeArray<bool> isHitObstacles; 
 
     // JOBS 
     public BoidAlignmentJob AlignmentJob;
@@ -99,6 +99,8 @@ public class BoidManager : MonoBehaviour {
           //  VelocitiesArray[i] = boid.velocity; 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
 
+            // raycast commands array init -> per boid one command 
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
@@ -114,14 +116,7 @@ public class BoidManager : MonoBehaviour {
         // alt:
         // var raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.Temp);
         // var raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.Temp);
-        
-
-        // raycast commands array init -> per boid one command 
-        for (int i = 0; i < number; ++i) {
-            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
-        }
-
-
+         
         // make job
         RaycastCommandJobs raycastJobs = new RaycastCommandJobs() {
             raycastDistance = raycastDistance,
@@ -135,32 +130,54 @@ public class BoidManager : MonoBehaviour {
         var setupDependency = raycastJobs.Schedule(number, 32);
         JobHandle raycastHandle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
         // Wait for the batch processing job to complete
-        raycastHandle.Complete();
+        raycastHandle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
 
         // CHECKPOINT: WE HAVE raycastCommandsArray ----------------------------------------------------------------
 
         // Copy the result (= RaycastHit Array). If batchedHit.collider is null there was no hit
-        //RaycastHit batchedHit = raycastHitsArray[0];
+        // RaycastHit batchedHit = raycastHitsArray[0];
 
         // Manage results from raycasting
 
         //withinBounds = new NativeArray<bool>(number, Allocator.TempJob);
-       // isHitObstacles = new NativeArray<bool>(number, Allocator.Persistent); // Allocator.TempJob);
-      //  hitNormals = new NativeArray<Vector3>(number, Allocator.Persistent); // Allocator.TempJob);
+        // isHitObstacles = new NativeArray<bool>(number, Allocator.Persistent); // Allocator.TempJob);
+        //  hitNormals = new NativeArray<Vector3>(number, Allocator.Persistent); // Allocator.TempJob);
+
 
         //  using collider to figure out if sth is hit
-        for (int i = 0; i < number; i++) {
-            isHitObstacles[i] = raycastHitsArray[i].collider ? true : false;
-            hitNormals[i] = raycastHitsArray[i].normal;
-           // turnings[i] = (withinBounds[i] == false || isHitObstacles[i]) ? true : false;
 
+
+        if (raycastHitsArray != null) {
+           // Debug.Log(raycastHitsArray);
+           // Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
+        }
+
+        for (int i = 0; i < number; i++) {
+            // the collider that was hit 
+            var hit = raycastHitsArray[i];
+            if (hit.collider) {  
+               // isHitObstacles[i] = true;
+                //Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
+            } else {
+                Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
+               // isHitObstacles[i] = false;
+            }
+
+            // the if else thing works, isHitObstacles throws bugs
+
+           // isHitObstacles[i] = hit.collider ? true : false;
+           // hitNormals[i] = raycastHitsArray[i].normal;
+            // turnings[i] = (withinBounds[i] == false || isHitObstacles[i]) ? true : false;
+
+            
             /*
             if (debug) {
                 if (isHitObstacles[i]) {
                     Debug.DrawRay(BoidsPositionArray[i], forwards[i] * raycastDistance, Color.yellow);
-                }
-            }*/
+                }*/
+
         }
+         
 
         // RAYCAST END-----------------------------------------------------------------------------------------------------------------------
         

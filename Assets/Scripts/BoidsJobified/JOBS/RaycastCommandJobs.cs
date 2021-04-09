@@ -12,6 +12,7 @@ struct RaycastCommandJobs : IJobParallelFor {
 
     public void Execute(int i) {
         Raycasts[i] = new RaycastCommand(positions[i], velocities[i], raycastDistance);//, layerMask);
+     //   Debug.DrawRay(positions[i], velocities[i] * raycastDistance, Color.yellow);  // works!!!
     }
 }
 

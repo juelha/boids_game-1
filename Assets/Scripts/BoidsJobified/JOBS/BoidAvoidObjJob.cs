@@ -22,7 +22,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         radius = 5; // change here
 
 
-        if (isHitObstacles[i]) {  // if theray cast from a boid hits sth -> avoid
+        if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);  // just making shit up at this point
             found++;
         }

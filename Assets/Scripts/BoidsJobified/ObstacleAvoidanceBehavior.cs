@@ -25,7 +25,7 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
        
 
         foreach (Transform obstacleTransform in boid.nearbyTransforms) {
-            Debug.Log(obstacleTransform);
+         //   Debug.Log(obstacleTransform);
 
             Collider obstacleCollider = obstacleTransform.GetComponent<Collider>();
             //get nearest point of the collider of the obstacle
