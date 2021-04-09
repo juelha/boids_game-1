@@ -13,7 +13,8 @@ public class Player : MonoBehaviour {
     float turnSmoothVelocity;
 
     void Start() {
-
+        //Set the tag of this GameObject to Player
+        gameObject.tag = "Player";
     }
 
     // Update is called once per frame

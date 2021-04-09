@@ -18,12 +18,14 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
     // Update is called once per frame
     void Update() {
 
+        radiusAvoidObstacle = 50;
         //init
         Vector3 avoidanceVector = Vector3.zero;
         int nAvoid = 0;
        
 
         foreach (Transform obstacleTransform in boid.nearbyTransforms) {
+            Debug.Log(obstacleTransform);
 
             Collider obstacleCollider = obstacleTransform.GetComponent<Collider>();
             //get nearest point of the collider of the obstacle
@@ -33,7 +35,7 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
 
             // if obstacle is near -> avoid
             if (closestPointofObstacle.magnitude < radiusAvoidObstacle) {
-                nAvoid++;
+              //  nAvoid++;
                 // avoidanceVector is opposite direction
                 avoidanceVector += (Vector3)(-closestPointofObstacle);
             }
@@ -41,8 +43,9 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
         }
 
         if (nAvoid > 0) {
-            avoidanceVector /= nAvoid;
-            boid.velocity += avoidanceVector; // bug here?
+            //   avoidanceVector /= nAvoid;
+           // avoidanceVector *= 100000000000000;
+            boid.velocity = avoidanceVector; // bug here?
 
         }
 

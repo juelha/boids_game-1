@@ -19,6 +19,7 @@ public class Boid : MonoBehaviour {
     void Start() {
         boidCollider = GetComponent<Collider>();
         nearbyTransforms = GetNearbyObjTransforms(boidCollider);
+        
     }
 
     public static Boid boid;
@@ -35,6 +36,7 @@ public class Boid : MonoBehaviour {
         Collider[] contextColliders = Physics.OverlapSphere(boidCollider.transform.position, nearbyObjRadius);
         // sorting out own collider and putting rest in list context
         foreach (Collider c in contextColliders) {
+            
             if (c != boidCollider) {
                 context.Add(c.transform);
             }

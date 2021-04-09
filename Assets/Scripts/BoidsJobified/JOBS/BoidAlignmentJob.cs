@@ -18,7 +18,7 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
         var found = 0;
         radius = 5; // change here
 
-        // loops over all transforms 
+        // loops over all positions 
         for (int j = 0; j < BoidsPositionArray.Length; j++) {     
             var curPosition = BoidsPositionArray[j]; 
             var diff = curPosition - transform.position;
@@ -29,7 +29,7 @@ public struct BoidAlignmentJob : IJobParallelForTransform {  // IJobParallelFor 
             }
         }
         if (found > 0) {
-            average_alignment = average_alignment / found;
+            average_alignment /= found;
             velocity[i] += average_alignment;
         }
     }

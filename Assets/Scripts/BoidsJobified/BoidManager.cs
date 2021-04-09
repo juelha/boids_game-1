@@ -8,13 +8,15 @@ using UnityEngine.Jobs;
 public class BoidManager : MonoBehaviour {
 
 
+
+    // GAMEOBJECT STUFF HERE
     public List<GameObject> goList;
-
-
     public GameObject prefab;
-    Player player;
+    GameObject playerObj;
+   // Boid boid;
     Vector3 playerPosition;
 
+    // RADIUS TO CHANGE IN EDITOR -> can be taken out here and assigned manually in each script 
     public float StartRadius;
 
     public float AlignmentRadius;
@@ -25,23 +27,30 @@ public class BoidManager : MonoBehaviour {
     public int number;
     public float maxVelocity;
 
+    // DATA CONTAINERS
     TransformAccessArray TransformAccessArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     NativeArray<Vector3> VelocitiesArray; // need to be able to write to it in the jobs
+
+    // RAYCAST STUFF
+    public ushort raycastDistance = 2;
+    public NativeArray<RaycastCommand> raycastCommandsArray;
 
     // JOBS 
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
     public BoidStayinRadiusJob StayinRadiusJob;
     public BoidPlayerAvoidJob PlayerAvoidJob;
+    public BoidAvoidObjJob AvoidObjJob;
 
     public BoidUpdateJob UpdateJob;
 
-    // Handles 
+    // JOBHANDLES 
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
     JobHandle StayinRadiusJobHandle;
     JobHandle PlayerAvoidJobHandle;
+    JobHandle AvoidObjJobHandle;
 
     JobHandle UpdateJobHandle;
 
@@ -56,8 +65,11 @@ public class BoidManager : MonoBehaviour {
         PlayerAvoidRadius = 7;
 
         // init player
-        player = GetComponent<Player>();
-
+        if (gameObject.tag == "Player") { 
+            playerObj = gameObject;
+        }
+        //player = GetComponent<Player>();  // use sth like if (col.gameObject.tag == "Boid") 
+        playerPosition =Vector3.zero; // OnTriggerEnter();
 
         // init arrays
         Transform[] TransformTemp = new Transform[number];
@@ -75,6 +87,7 @@ public class BoidManager : MonoBehaviour {
             TransformTemp[i] = obj.transform;
 
             BoidsPositionArray[i] = obj.transform.position;
+          //  VelocitiesArray[i] = boid.velocity; 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
 
         }
@@ -84,16 +97,49 @@ public class BoidManager : MonoBehaviour {
 
    
     private void Update() {
-        
-        playerPosition = player.transform.position;
+
+        // RAYCAST START--------------------------------------------------------------------------------------------
+            
+        // raycast data containers
+        raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastHit> raycastHits = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+
+        // raycast dc init
+        for (int i = 0; i < number; ++i) {
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+        }
+
+
+        //Schedule the batch of raycasts
+        RaycastCommandJobs raycastJobs = new RaycastCommandJobs() {
+            raycastDistance = raycastDistance,
+            velocities = VelocitiesArray,
+            positions = BoidsPositionArray,
+            Raycasts = raycastCommandsArray,
+            //layerMask = avoidanceLayer
+        }; // 104
+        var setupDependency = raycastJobs.Schedule(number, 32);
+        JobHandle raycastHandle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHits, 32, setupDependency);
+        raycastHandle.Complete();
+
+        // CHECKPOINT: WE HAVE raycastCommandsArray ----------------------------------------------------------------
+
+
+        RaycastHit batchedHit = raycastCommandsArray[0];
+
+
+
+        // RAYCAST END-----------------------------------------------------------------------------------------------------------------------
+
+
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // new job-----------------------------------------------------------
         AlignmentJob = new BoidAlignmentJob() {
-            BoidsPositionArray = BoidsPositionArray,
-            velocity = VelocitiesArray,
-            radius = AlignmentRadius,
+        BoidsPositionArray = BoidsPositionArray,
+        velocity = VelocitiesArray,
+        radius = AlignmentRadius,
         };
 
         CohesionJob = new BoidCohesionJob() {
@@ -115,6 +161,13 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
             radius = PlayerAvoidRadius,
         };
+
+        AvoidObjJob = new BoidAvoidObjJob() {
+            NearbyObjsPositionArray = NearbyObjsPositionArray,
+            velocity = VelocitiesArray,
+            radius = PlayerAvoidRadius,
+        };
+
 
         UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
@@ -152,10 +205,17 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
         TransformAccessArray.Dispose();
+        raycastCommandsArray.Dispose();
      }
 
 
-   
+    private Vector3 OnTriggerEnter(Collider other) {
+        //Check to see if the tag on the collider is equal to Enemy
+        if (other.tag == "Player") {
+            playerPosition = other.transform.position;
+        }
+        return playerPosition;
+    }
 
 
 

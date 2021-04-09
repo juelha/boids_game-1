@@ -7,6 +7,7 @@ using Unity.Collections;
 public struct BoidPlayerAvoidJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
 
     public Vector3 playerPosition;
+   // public GameObject playerObj;
     public float radius;
     public NativeArray<Vector3> velocity;
 
