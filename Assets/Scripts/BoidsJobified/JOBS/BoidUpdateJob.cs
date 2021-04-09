@@ -35,7 +35,7 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
             velocity[i] = velocity[i].normalized * maxVelocity;
         }
         
-        velocity[i] = transform.rotation * Vector3.up;  //upward part points in direction of movement
+        velocity[i] += transform.rotation * Vector3.up;  //upward part points in direction of movement
                                                         //  transform.position += (Vector3)velocity * Time.deltaTime;
         transform.position += velocity[i] * deltaTime;
         //transform.localPosition = vel;// * deltaTime;   

@@ -42,6 +42,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
         if (found > 0) {
             avoidanceVector /= found;
+            avoidanceVector *= 1000;
             velocity[i] += avoidanceVector;
         }
 
