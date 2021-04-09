@@ -21,7 +21,7 @@ public class Boid : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         boidCollider = GetComponent<Collider>();
-        nearbyObjRadius = 5;
+       // nearbyObjRadius = 5;
        // boidObj = GetComponent<GameObject>();
         nearbyTransforms = GetNearbyObjTransforms(boidCollider);
     }
@@ -35,13 +35,13 @@ public class Boid : MonoBehaviour {
 
     public List<Transform> GetNearbyObjTransforms(Collider boidCollider) {
         List<Transform> context = new List<Transform>();
-        GameObject boidObj = boidCollider.GetComponent<GameObject>();
+       // GameObject boidObj = boidCollider.GetComponent<GameObject>();
 
         //instancing a array of colliders ´which entails every collider in a given radius (-> neighborRadius)
-        Collider[] contextColliders = Physics.OverlapSphere(boidObj.transform.position, nearbyObjRadius);
+        Collider[] contextColliders = Physics.OverlapSphere(boidCollider.transform.position, nearbyObjRadius);
         // sorting out own collider and putting rest in list context
         foreach (Collider c in contextColliders) {
-            if (c != boidObj.GetComponent<Collider>()) {
+            if (c != boidCollider) {
                 context.Add(c.transform);
             }
 
@@ -49,44 +49,6 @@ public class Boid : MonoBehaviour {
         return context;
     }
 
-
-    public void Update() {  // this is where we actually do stuff!!!
-
-
-    }
-
-    //  jobs doesnt support strongly typed classes ->  encapsulate the code we want to jobify into a struct
-    public struct encapsulatedData {
-
-
-
-        public Vector3 _velocity;
-        public Vector3 pos;
-        public Quaternion quat;
-        public float maxVelocity;
-
-        // needed to change vel in JOBS
-        /* public Vector3 vel {
-             get { return _velocity; }
-             set { _velocity = value; }
-         } */
-        public Vector3 GetVelocity() {
-            return _velocity;
-        }
-
-        public void SetVelocity(Vector3 vel) {  // this is where we actually do stuff!!!
-            _velocity = vel; 
-
-        }
-
-        public void Update() {  // this is where we actually do stuff!!!
-
-
-        }
-
-
-
-    }
 
 
 }

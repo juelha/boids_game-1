@@ -18,27 +18,21 @@ public class BoidManager : MonoBehaviour {
     public int number;
     public float maxVelocity;
 
-    //
-    //NativeArray<Transform> Velocities;
     TransformAccessArray TransformAccessArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+    NativeArray<Vector3> VelocitiesArray; // need to be able to write to it in the jobs
 
-    //public List<Collider> contextColliders;
-    List<Transform> nearbyTransforms;
-   // [ReadOnly] public NativeArray<Collision> BoidsCollisionArray;
-
-    NativeArray<Vector3> VelocitiesArray; // saving vel here not in Boid.cs
-
-    // DO NOT TOUCH
-    // private Transform[] TransformTemp;// = new Transform[100];
-
-    public BoidUpdateJob UpdateJob;
+    // JOBS STUFF
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
+    public BoidStayinRadiusJob StayinRadiusJob;
+    public BoidUpdateJob UpdateJob;
 
-    JobHandle UpdateJobHandle;
+    
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
+    JobHandle StayinRadiusJobHandle;
+    JobHandle UpdateJobHandle;
 
 
     void Start() {
@@ -77,16 +71,21 @@ public class BoidManager : MonoBehaviour {
 
         // new job-----------------------------------------------------------
         AlignmentJob = new BoidAlignmentJob() {
-            deltaTime = Time.deltaTime,
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
 
         CohesionJob = new BoidCohesionJob() {
-            deltaTime = Time.deltaTime,
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
+
+        // /*
+        StayinRadiusJob = new BoidStayinRadiusJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
+      //  */
 
         UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
@@ -96,7 +95,7 @@ public class BoidManager : MonoBehaviour {
         // Schedule--------------------------------------------------------
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
-
+        StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
 
 
         // update gets called in the end and uses the changed velocities to move obj with transform
@@ -107,11 +106,12 @@ public class BoidManager : MonoBehaviour {
 
         //   JobHandle jh = JobHandle.CombineDependencies(handles);
 
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
+        StayinRadiusJobHandle.Complete();
 
         UpdateJobHandle.Complete();
     }

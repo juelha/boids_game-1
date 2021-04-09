@@ -42,9 +42,11 @@ public class PlayerAvoidanceBehavior : MonoBehaviour {
             nAvoid++;
             // avoidanceVector is opposite direction
             avoidanceVector += (Vector3)(-diff);
+            /*
             if (Vector3.SqrMagnitude(diff) < 0.25f) {
                 Debug.Log("Boid gefressen");
             }
+            */
         }
 
         if (nAvoid > 0) {
