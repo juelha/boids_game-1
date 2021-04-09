@@ -38,8 +38,8 @@ public class BoidManager : MonoBehaviour {
     public NativeArray<RaycastHit> raycastHitsArray;
 
     // for managing raycast results -> TODO: 
-    public NativeArray<Vector3> hitNormals;
-    public NativeArray<bool> isHitObstacles; 
+  //  public NativeArray<Vector3> hitNormals;
+  //  public NativeArray<bool> isHitObstacles; 
 
     // JOBS 
     public BoidAlignmentJob AlignmentJob;
@@ -110,13 +110,14 @@ public class BoidManager : MonoBehaviour {
     private void Update() {
 
         // RAYCAST START--------------------------------------------------------------------------------------------
+        NativeArray<bool> isHitObstacles = new NativeArray<bool>(number, Allocator.TempJob);
+        NativeArray<Vector3> hitNormals = new NativeArray<Vector3>(number, Allocator.TempJob);
 
-        
 
         // alt:
         // var raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.Temp);
         // var raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.Temp);
-         
+
         // make job
         RaycastCommandJobs raycastJobs = new RaycastCommandJobs() {
             raycastDistance = raycastDistance,
@@ -156,11 +157,11 @@ public class BoidManager : MonoBehaviour {
             // the collider that was hit 
             var hit = raycastHitsArray[i];
             if (hit.collider) {  
-               // isHitObstacles[i] = true;
+                isHitObstacles[i] = true;
                 //Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
             } else {
                 Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
-               // isHitObstacles[i] = false;
+                isHitObstacles[i] = false;
             }
 
             // the if else thing works, isHitObstacles throws bugs
@@ -252,6 +253,11 @@ public class BoidManager : MonoBehaviour {
         AvoidObjJobHandle.Complete();
 
         UpdateJobHandle.Complete();
+
+
+        //dipose raycast bs
+        hitNormals.Dispose();
+        isHitObstacles.Dispose();
     }
 
      private void OnDestroy() {
