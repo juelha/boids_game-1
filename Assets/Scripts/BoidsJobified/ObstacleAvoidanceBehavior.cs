@@ -27,15 +27,15 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
 
             Collider obstacleCollider = obstacleTransform.GetComponent<Collider>();
             //get nearest point of the collider of the obstacle
-            Vector3 closestPointofObstacle = obstacleCollider.ClosestPoint(this.transform.position);
+            Vector3 closestPointofObstacle = obstacleCollider.ClosestPoint(boid.transform.position);
 
-            var diff = closestPointofObstacle - this.transform.position;
+           // var diff = closestPointofObstacle - this.transform.position;
 
             // if obstacle is near -> avoid
-            if (diff.magnitude < radiusAvoidObstacle) {
+            if (closestPointofObstacle.magnitude < radiusAvoidObstacle) {
                 nAvoid++;
                 // avoidanceVector is opposite direction
-                avoidanceVector += (Vector3)(-diff);
+                avoidanceVector += (Vector3)(-closestPointofObstacle);
             }
 
         }

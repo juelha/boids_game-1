@@ -13,8 +13,12 @@ public class BoidManager : MonoBehaviour {
 
     public GameObject prefab;
 
-    public float radius;
-    public float neighborRadius;
+    public float StartRadius;
+
+    public float AlignmentRadius;
+    public float CohesionRadius;
+    public float StayinRadius;
+
     public int number;
     public float maxVelocity;
 
@@ -36,15 +40,22 @@ public class BoidManager : MonoBehaviour {
 
 
     void Start() {
+
+        // init radius 
+        StartRadius = 10;
+        AlignmentRadius = 50;
+        CohesionRadius = 100;
+        StayinRadius = 100;
+
+
+        // init arrays
         Transform[] TransformTemp = new Transform[number];
-       // NativeArray<Vector3> BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
-       // NativeArray<Vector3> VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
         BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
 
         for (int i = 0; i < number; ++i) {
 
-            goList.Add(Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation));
+            goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius, Random.rotation));
          
             // ref to current gameobject 
             var obj = goList[i];
@@ -54,14 +65,10 @@ public class BoidManager : MonoBehaviour {
 
             BoidsPositionArray[i] = obj.transform.position;
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
-         //   List<Transform> nearbyTransforms = GetNearbyObjects(obj);
 
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
-        
-        
-        //BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
     }
 
    
@@ -73,17 +80,20 @@ public class BoidManager : MonoBehaviour {
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
+            radius = AlignmentRadius,
         };
 
         CohesionJob = new BoidCohesionJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
+            radius = CohesionRadius,
         };
 
         // /*
         StayinRadiusJob = new BoidStayinRadiusJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
+            radius = StayinRadius,
         };
       //  */
 
@@ -122,7 +132,7 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
         TransformAccessArray.Dispose();
-    }
+     }
 
 
    

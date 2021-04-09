@@ -7,7 +7,7 @@ using Unity.Collections;
 public struct BoidStayinRadiusJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
 
     public Vector3 center;
-    public int radius;
+    public float radius;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     public NativeArray<Vector3> velocity;
 
