@@ -12,12 +12,15 @@ public class BoidManager : MonoBehaviour {
 
 
     public GameObject prefab;
+    Player player;
+    Vector3 playerPosition;
 
     public float StartRadius;
 
     public float AlignmentRadius;
     public float CohesionRadius;
     public float StayinRadius;
+    public float PlayerAvoidRadius;
 
     public int number;
     public float maxVelocity;
@@ -26,16 +29,20 @@ public class BoidManager : MonoBehaviour {
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     NativeArray<Vector3> VelocitiesArray; // need to be able to write to it in the jobs
 
-    // JOBS STUFF
+    // JOBS 
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
     public BoidStayinRadiusJob StayinRadiusJob;
+    public BoidPlayerAvoidJob PlayerAvoidJob;
+
     public BoidUpdateJob UpdateJob;
 
-    
+    // Handles 
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
     JobHandle StayinRadiusJobHandle;
+    JobHandle PlayerAvoidJobHandle;
+
     JobHandle UpdateJobHandle;
 
 
@@ -46,6 +53,10 @@ public class BoidManager : MonoBehaviour {
         AlignmentRadius = 50;
         CohesionRadius = 100;
         StayinRadius = 100;
+        PlayerAvoidRadius = 7;
+
+        // init player
+        player = GetComponent<Player>();
 
 
         // init arrays
@@ -73,6 +84,8 @@ public class BoidManager : MonoBehaviour {
 
    
     private void Update() {
+        
+        playerPosition = player.transform.position;
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
@@ -95,7 +108,13 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
             radius = StayinRadius,
         };
-      //  */
+        //  */
+
+        PlayerAvoidJob = new BoidPlayerAvoidJob() {
+            playerPosition = playerPosition,
+            velocity = VelocitiesArray,
+            radius = PlayerAvoidRadius,
+        };
 
         UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
@@ -106,7 +125,7 @@ public class BoidManager : MonoBehaviour {
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
         StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
-
+        PlayerAvoidJobHandle = PlayerAvoidJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
 
         // update gets called in the end and uses the changed velocities to move obj with transform
         // combine all dependencies: 
@@ -116,12 +135,13 @@ public class BoidManager : MonoBehaviour {
 
         //   JobHandle jh = JobHandle.CombineDependencies(handles);
 
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, PlayerAvoidJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
         StayinRadiusJobHandle.Complete();
+        PlayerAvoidJobHandle.Complete();
 
         UpdateJobHandle.Complete();
     }

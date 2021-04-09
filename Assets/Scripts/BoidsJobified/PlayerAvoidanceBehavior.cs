@@ -29,10 +29,6 @@ public class PlayerAvoidanceBehavior : MonoBehaviour {
         int nAvoid = 0;
 
         Collider playerCollider = player.GetComponent<Collider>();
-       // Collider playerPosition = player.transform.position;
-
-      //  Vector3 closestPointofAgent = playerCollider.ClosestPoint(this.transform.position);
-        // .ClosestPoint calculates closest point between playerCollider and position of boid
         Vector3 closestPointofAgent = playerCollider.ClosestPoint(this.transform.position);
 
         var diff = closestPointofAgent - this.transform.position;
