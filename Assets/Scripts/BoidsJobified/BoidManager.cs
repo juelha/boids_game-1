@@ -35,6 +35,11 @@ public class BoidManager : MonoBehaviour {
     // RAYCAST STUFF
     public ushort raycastDistance = 2;
     public NativeArray<RaycastCommand> raycastCommandsArray;
+    public NativeArray<RaycastHit> raycastHitsArray;
+
+    // for managing raycast results -> TODO: delete one of them
+    NativeArray<Vector3> hitNormals;
+    NativeArray<bool> isHitObstacles; 
 
     // JOBS 
     public BoidAlignmentJob AlignmentJob;
@@ -76,6 +81,10 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
 
+        // raycast data containers
+        raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.Persistent); // Allocator.TempJob);
+        raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.Persistent); // Allocator.TempJob);
+
         for (int i = 0; i < number; ++i) {
 
             goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius, Random.rotation));
@@ -99,18 +108,21 @@ public class BoidManager : MonoBehaviour {
     private void Update() {
 
         // RAYCAST START--------------------------------------------------------------------------------------------
-            
-        // raycast data containers
-        raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastHit> raycastHits = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
-        // raycast dc init
+        
+
+        // alt:
+        // var raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.Temp);
+        // var raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.Temp);
+        
+
+        // raycast commands array init -> per boid one command 
         for (int i = 0; i < number; ++i) {
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
         }
 
 
-        //Schedule the batch of raycasts
+        // make job
         RaycastCommandJobs raycastJobs = new RaycastCommandJobs() {
             raycastDistance = raycastDistance,
             velocities = VelocitiesArray,
@@ -118,19 +130,41 @@ public class BoidManager : MonoBehaviour {
             Raycasts = raycastCommandsArray,
             //layerMask = avoidanceLayer
         }; // 104
+
+        // Schedule the batch of raycasts
         var setupDependency = raycastJobs.Schedule(number, 32);
-        JobHandle raycastHandle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHits, 32, setupDependency);
+        JobHandle raycastHandle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
+        // Wait for the batch processing job to complete
         raycastHandle.Complete();
 
         // CHECKPOINT: WE HAVE raycastCommandsArray ----------------------------------------------------------------
 
+        // Copy the result (= RaycastHit Array). If batchedHit.collider is null there was no hit
+        //RaycastHit batchedHit = raycastHitsArray[0];
 
-        RaycastHit batchedHit = raycastCommandsArray[0];
+        // Manage results from raycasting
 
+        //withinBounds = new NativeArray<bool>(number, Allocator.TempJob);
+       // isHitObstacles = new NativeArray<bool>(number, Allocator.Persistent); // Allocator.TempJob);
+      //  hitNormals = new NativeArray<Vector3>(number, Allocator.Persistent); // Allocator.TempJob);
 
+        //  using collider to figure out if sth is hit
+        for (int i = 0; i < number; i++) {
+            isHitObstacles[i] = raycastHitsArray[i].collider ? true : false;
+            hitNormals[i] = raycastHitsArray[i].normal;
+           // turnings[i] = (withinBounds[i] == false || isHitObstacles[i]) ? true : false;
+
+            /*
+            if (debug) {
+                if (isHitObstacles[i]) {
+                    Debug.DrawRay(BoidsPositionArray[i], forwards[i] * raycastDistance, Color.yellow);
+                }
+            }*/
+        }
 
         // RAYCAST END-----------------------------------------------------------------------------------------------------------------------
-
+        
+        
 
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
@@ -163,7 +197,8 @@ public class BoidManager : MonoBehaviour {
         };
 
         AvoidObjJob = new BoidAvoidObjJob() {
-            NearbyObjsPositionArray = NearbyObjsPositionArray,
+            isHitObstacles = isHitObstacles,
+            hitNormals = hitNormals,
             velocity = VelocitiesArray,
             radius = PlayerAvoidRadius,
         };
@@ -179,6 +214,8 @@ public class BoidManager : MonoBehaviour {
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
         StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
         PlayerAvoidJobHandle = PlayerAvoidJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, PlayerAvoidJobHandle);
+
 
         // update gets called in the end and uses the changed velocities to move obj with transform
         // combine all dependencies: 
@@ -188,36 +225,35 @@ public class BoidManager : MonoBehaviour {
 
         //   JobHandle jh = JobHandle.CombineDependencies(handles);
 
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, PlayerAvoidJobHandle);
+        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
         StayinRadiusJobHandle.Complete();
         PlayerAvoidJobHandle.Complete();
+        AvoidObjJobHandle.Complete();
 
         UpdateJobHandle.Complete();
     }
 
      private void OnDestroy() {
-    //private void OnDisable() {
+   // private void OnDisable() {
         
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
         TransformAccessArray.Dispose();
+
+
         raycastCommandsArray.Dispose();
+        raycastHitsArray.Dispose();
+
+      //  isHitObstacles.Dispose();
+      //  hitNormals.Dispose();
      }
 
 
-    private Vector3 OnTriggerEnter(Collider other) {
-        //Check to see if the tag on the collider is equal to Enemy
-        if (other.tag == "Player") {
-            playerPosition = other.transform.position;
-        }
-        return playerPosition;
-    }
-
-
+  
 
 
 
