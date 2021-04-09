@@ -60,7 +60,7 @@ public class BoidManager : MonoBehaviour {
 
             BoidsPositionArray[i] = obj.transform.position;
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
-            List<Transform> nearbyTransforms = GetNearbyObjects(obj);
+         //   List<Transform> nearbyTransforms = GetNearbyObjects(obj);
 
         }
 
@@ -125,20 +125,7 @@ public class BoidManager : MonoBehaviour {
     }
 
 
-    public List<Transform> GetNearbyObjects(GameObject obj) {
-        List<Transform> context = new List<Transform>();
-        //instancing a array of colliders ´which entails every collider in a given radius (-> neighborRadius)
-        Collider[] contextColliders = Physics.OverlapSphere(obj.transform.position, neighborRadius);
-        // sorting out own collider and putting rest in list context
-        foreach (Collider c in contextColliders) {
-            if (c != obj.GetComponent<Collider>()) {
-                context.Add(c.transform);
-            }
-
-        }
-        return context;
-    }
-
+   
 
 
 

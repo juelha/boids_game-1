@@ -2,12 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Boid))]
 
 public class ObstacleAvoidanceBehavior : MonoBehaviour {
 
-    Boid boid;
+    private Boid boid;
     int radiusAvoidObstacle;
-    List<Transform> nearbyTransforms;
+    // List<Transform> nearbyTransforms;
+
+    // Start is called before the first frame update
+    void Start() {
+        boid = GetComponent<Boid>();
+    }
 
     // Update is called once per frame
     void Update() {
@@ -17,7 +23,7 @@ public class ObstacleAvoidanceBehavior : MonoBehaviour {
         int nAvoid = 0;
        
 
-        foreach (Transform obstacleTransform in nearbyTransforms) {
+        foreach (Transform obstacleTransform in boid.nearbyTransforms) {
 
             Collider obstacleCollider = obstacleTransform.GetComponent<Collider>();
             //get nearest point of the collider of the obstacle
