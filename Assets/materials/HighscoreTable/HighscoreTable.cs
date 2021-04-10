@@ -68,6 +68,9 @@ public class HighscoreTable : MonoBehaviour {
             }
             count++;
         }
+
+        //set best
+        PlayerPrefs.SetFloat("Best", highscores.highscoreEntryList[0].score);
     }
 
     private void CreateHighscoreEntryTransform(HighscoreEntry highscoreEntry, Transform container, List<Transform> transformList) {
@@ -153,15 +156,18 @@ public class HighscoreTable : MonoBehaviour {
         RefreshHighscoreTable();
     }
 
-    private class Highscores {
+
+    private class Highscores
+    {
         public List<HighscoreEntry> highscoreEntryList;
     }
 
     /*
      * Represents a single High score entry
      * */
-    [System.Serializable] 
-    private class HighscoreEntry {
+    [System.Serializable]
+    private class HighscoreEntry
+    {
         public int score;
         public string name;
     }
