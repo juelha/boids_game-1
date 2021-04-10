@@ -122,17 +122,21 @@ public class BoidManager : MonoBehaviour {
             velocities = VelocitiesArray,
            // positions = BoidsPositionArray,
             Raycasts = raycastCommandsArray,
+            Hits = raycastHitsArray,
             //layerMask = avoidanceLayer
         }; // 104
 
         // Schedule the batch of raycasts
+        // Schedule the batch of raycasts
+        JobHandle handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, number, default(JobHandle));
         // var setupDependency = raycastJobs.Schedule(number, 32);
-        JobHandle raycastHandle;// = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32);//, setupDependency);
-                                                                                                           // Wait for the batch processing job to complete
+        //  JobHandle raycastHandle;// = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32);//, setupDependency);
+        // Wait for the batch processing job to complete
 
-        raycastHandle = _RaycastCommandJobs.Schedule(TransformAccessArray);
+        //  raycastHandle = _RaycastCommandJobs.Schedule(TransformAccessArray);
+        //   raycastHandle = // need raycastHitsArray
 
-        raycastHandle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+        handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
 
         // CHECKPOINT: WE HAVE raycastCommandsArray ----------------------------------------------------------------
 
@@ -161,7 +165,7 @@ public class BoidManager : MonoBehaviour {
             // Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
             if (hit.collider) {  
                 isHitObstacles[i] = true;
-                
+                Debug.Log(isHitObstacles[i]);
             } else {
                 isHitObstacles[i] = false;
             }
@@ -200,12 +204,12 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
         };
 
-        // /*
+         /*
         StayinRadiusJob = new BoidStayinRadiusJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
-        //  */
+          */
 
         AvoidPlayerJob = new BoidAvoidPlayerJob() {
             playerPosition = playerPosition,
@@ -219,17 +223,18 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
         };
 
-
+        /*
         UpdateJob = new BoidUpdateJob() {  // LAST
             deltaTime = Time.deltaTime,
             velocity = VelocitiesArray,
         };
+        */
 
         // Schedule--------------------------------------------------------
-        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray, raycastHandle);
+        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray, handle);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
-        StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
-        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
+        //StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, CohesionJobHandle);
         AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, AvoidPlayerJobHandle);
 
 
@@ -241,16 +246,16 @@ public class BoidManager : MonoBehaviour {
 
         //   JobHandle jh = JobHandle.CombineDependencies(handles);
 
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
+       // UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
-        StayinRadiusJobHandle.Complete();
+       // StayinRadiusJobHandle.Complete();
         AvoidPlayerJobHandle.Complete();
         AvoidObjJobHandle.Complete();
 
-        UpdateJobHandle.Complete();
+      //  UpdateJobHandle.Complete();
 
 
         //dipose raycast bs
@@ -259,8 +264,11 @@ public class BoidManager : MonoBehaviour {
 
         // figure out where to do this
         for (int i = 0; i < number; i++) {
-            TransformAccessArray[i].up = VelocitiesArray[i];
-            transform.position += VelocitiesArray[i] * Time.deltaTime;
+            if (VelocitiesArray[i].magnitude > maxVelocity) {
+                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
+            }
+             TransformAccessArray[i].up = VelocitiesArray[i];
+            TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
         }
 
     }

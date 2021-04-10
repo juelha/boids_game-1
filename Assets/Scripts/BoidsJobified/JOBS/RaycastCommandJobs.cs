@@ -24,6 +24,7 @@ struct RaycastCommandJobs : IJobParallelForTransform {
    // [ReadOnly] public NativeArray<Vector3> positions;
     //[ReadOnly] public LayerMask layerMask;
     public NativeArray<RaycastCommand> Raycasts;
+    public NativeArray<RaycastHit> Hits;
 
     public void Execute(int i, TransformAccess transform) {
         Raycasts[i] = new RaycastCommand(transform.position, velocities[i], raycastDistance);//, layerMask);

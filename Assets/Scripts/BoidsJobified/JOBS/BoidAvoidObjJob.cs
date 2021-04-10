@@ -21,7 +21,9 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
 
         if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
-            avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);  // just making shit up at this point
+           // avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);  // just making shit up at this point
+            avoidanceVector = (-velocity[i]);
+            Debug.Log(velocity[i]);
             found++;
         }
 
@@ -29,7 +31,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         if (found > 0) {
             avoidanceVector /= found;  // normalizing
             avoidanceVector *= weight; // change for getting desired effect in flock behavior
-            velocity[i] += avoidanceVector;
+            velocity[i] *= -1 ; // opposite direction
         }
 
     }
