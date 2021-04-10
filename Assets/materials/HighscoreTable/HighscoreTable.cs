@@ -70,7 +70,7 @@ public class HighscoreTable : MonoBehaviour {
         }
 
         //set best
-        PlayerPrefs.SetFloat("Best", highscores.highscoreEntryList[0].score);
+        PlayerPrefs.SetInt("Best", highscores.highscoreEntryList[0].score);
     }
 
     private void CreateHighscoreEntryTransform(HighscoreEntry highscoreEntry, Transform container, List<Transform> transformList) {
