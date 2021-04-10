@@ -18,17 +18,45 @@ struct RaycastCommandJobs : IJobParallelFor {
     }
 }*/
 
-struct RaycastCommandJobs : IJobParallelForTransform {
+struct BoidRaycastCommandJobs : IJobParallelFor {
     [ReadOnly] public ushort raycastDistance;
     [ReadOnly] public NativeArray<Vector3> velocities;
-   // [ReadOnly] public NativeArray<Vector3> positions;
+    [ReadOnly] public NativeArray<Vector3> positions;
+    // [ReadOnly] public NativeArray<Vector3> positions;
     //[ReadOnly] public LayerMask layerMask;
+    public NativeArray<bool> isHitObstacles;
     public NativeArray<RaycastCommand> Raycasts;
-    public NativeArray<RaycastHit> Hits;
+   // public NativeArray<RaycastHit> Hits;
 
-    public void Execute(int i, TransformAccess transform) {
-        Raycasts[i] = new RaycastCommand(transform.position, velocities[i], raycastDistance);//, layerMask);
-        Debug.DrawRay(transform.position, velocities[i] * raycastDistance, Color.yellow);  // works!!!
+    public void Execute(int i) {
+        // var results = new NativeArray<RaycastHit>(1, Allocator.Temp);
+     
+        Raycasts[i] = new RaycastCommand(positions[i], velocities[i], raycastDistance);//, layerMask);
+        Debug.DrawRay(positions[i], velocities[i] * raycastDistance, Color.yellow);  // works!!!
+
+        RaycastHit hit;
+        if (Physics.SphereCast(positions[i],2, velocities[i], out hit, raycastDistance)) {
+            isHitObstacles[i] = true;
+           // return true;
+        }
+        else { }
+            isHitObstacles[i] = false;
+
+        // Schedule the batch of raycasts
+        // var handle = RaycastCommand.ScheduleBatch(Raycasts, results, 1);
+
+        // Wait for the batch processing job to complete
+        //  handle.Complete();
+
+        // Copy the result. If batchedHit.collider is null there was no hit
+        //  RaycastHit batchedHit = results[0];
+        //  Hits[i] = results[0];
+
+
+
+
+
+
     }
 }
 
