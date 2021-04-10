@@ -100,6 +100,8 @@ public class BoidManager : MonoBehaviour {
           //  VelocitiesArray[i] = boid.velocity; 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
 
+            transform.up = VelocitiesArray[i]; //upward part points in direction of movement
+
             // raycast commands array init -> per boid one command 
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
         }
@@ -163,7 +165,8 @@ public class BoidManager : MonoBehaviour {
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
             var hit = raycastHitsArray[i];
-           // Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
+           // transform.up = VelocitiesArray[i];
+            // Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
             if (hit.collider) {  
                 isHitObstacles[i] = true;
                 
@@ -265,6 +268,13 @@ public class BoidManager : MonoBehaviour {
         //dipose raycast bs
         hitNormals.Dispose();
         isHitObstacles.Dispose();
+
+        // figure out where to do this
+        for (int i = 0; i < number; i++) {
+            TransformAccessArray[i].up = VelocitiesArray[i];
+            transform.position += VelocitiesArray[i] * Time.deltaTime;
+        }
+
     }
 
      private void OnDestroy() {

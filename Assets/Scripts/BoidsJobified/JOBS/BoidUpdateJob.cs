@@ -34,12 +34,35 @@ public struct BoidUpdateJob : IJobParallelForTransform {  // IJobParallelFor can
         if (velocity[i].magnitude > maxVelocity) {
             velocity[i] = velocity[i].normalized * maxVelocity;
         }
-        
-        velocity[i] += transform.rotation * Vector3.up;  //upward part points in direction of movement
-                                                        //  transform.position += (Vector3)velocity * Time.deltaTime;
+
+        // velocity[i] += transform.rotation * Vector3.up;  //upward part points in direction of movement
+        //  transform.position += (Vector3)velocity * Time.deltaTime;
+
+        var m_MyX = velocity[i].x;
+        var m_MyY = velocity[i].y;
+        var m_MyZ = velocity[i].z;
+
+     //   transform.rotation = Change(0, 1, 0);
+     //   transform.rotation = Change(m_MyX, m_MyY, m_MyZ);
+        transform.rotation = Quaternion.LookRotation(transform.position+ Vector3.up, velocity[i]); // transform.forward
+
+
+
+
+        var bla = Vector3.up;
         transform.position += velocity[i] * deltaTime;
         //transform.localPosition = vel;// * deltaTime;   
     }
+
+    //Change the Quaternion values depending on the values of the Sliders
+    private static Quaternion Change(float x, float y, float z) {
+        Quaternion newQuaternion = new Quaternion();
+        newQuaternion.Set(x, y, z, 1);
+        //Return the new Quaternion
+        return newQuaternion;
+    }
+
+
 
 
 }
