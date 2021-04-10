@@ -24,6 +24,7 @@ public class CompositeBehavior2 : FlockBehavior
         {
             Vector3 partialMove = behaviors[i].CalculateMove(agent, context, flock) * weights[i];
             //if some movement is returned
+            //Debug.Log("Vector:" + partialMove);
             if (partialMove != Vector3.zero)
             {
                 // if movement exceeds wheigth normalize and give it lenght stored in weight

@@ -9,12 +9,14 @@ public class Flock : MonoBehaviour
     public FlockAgent xtrapointsBoid;
 
     public FlockAgent xtratimeBoid;
+
+    public PlayerMovement player;
     //List of all agents in flock
     List<FlockAgent> agents = new List<FlockAgent>();
     public FlockBehavior behavior;
     private Flock myFlock;
 
-    [Range(10, 500)]
+    [Range(1, 500)]
     public int startingCount = 250;
     const float AgentDensity = 0.08f;
     [Range(1, 20)]
@@ -33,16 +35,23 @@ public class Flock : MonoBehaviour
     public float obstacleAvoidanceRadius = 2f;
     [Range(0f, 10f)]
     public float agentAvoidanceRadius = 4f;
+    [Range(0f, 100f)]
+    public float huntingRadius = 20f;
 
     float squareMaxSpeed;
     float squareNeighborRadius;
     float squareAvoidanceRadius;
     float squareObstacleAvoidanceRadius;
     float squareAgentAvoidanceRadius;
+    float squareHuntingRadius;
     public float SquareAvoidanceRadius { get { return squareAvoidanceRadius; } }
     public float SquareObstacleAvoidanceRadius {get { return squareObstacleAvoidanceRadius; } }
 
     public float SquareAgentAvoidanceRadius { get { return squareAgentAvoidanceRadius; } }
+
+    public float SquareHuntingRadius { get { return squareHuntingRadius; } }
+
+    public PlayerMovement getPlayer{ get { return player; }}
     // Start is called before the first frame update
     void Start()
     {
@@ -53,7 +62,7 @@ public class Flock : MonoBehaviour
         squareAvoidanceRadius = squareNeighborRadius * avoidanceRadiusMultiplier * avoidanceRadiusMultiplier;
         squareObstacleAvoidanceRadius = obstacleAvoidanceRadius * obstacleAvoidanceRadius;
         squareAgentAvoidanceRadius = agentAvoidanceRadius * agentAvoidanceRadius;
-
+        squareHuntingRadius = huntingRadius * huntingRadius;
         //instatiation of the flock, determining the number of boids in the starting count
         for (int i = 0; i < startingCount; i++)
         {

@@ -82,4 +82,9 @@ public class PlayerMovement : MonoBehaviour
         StartCoroutine(slowDownTime(slowDownFor));
     }
 
+    public Vector3 getPosition()
+    {
+        return transform.position;
+    }
+
 }
