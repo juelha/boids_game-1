@@ -6,6 +6,7 @@ using Unity.Collections;
 
 public struct BoidAvoidObjJob : IJobParallelForTransform {
 
+    public float deltaTime;
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
     [ReadOnly] public NativeArray<Vector3> hitNormals;
@@ -18,6 +19,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
         var avoidanceVector = Vector3.zero;
         var found = 0;
+        var rotationSpeed = 2; 
 
         Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
@@ -30,11 +32,17 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             Debug.Log(isHitObstacles[i]);
            // velocity[i] = Vector3.Reflect(velocity[i], Vector3.right);
             found++;
-           
+
+            // calc new vector: 
+            avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+
+            velocity[i] += avoidanceVector; 
+            //  var test = Vector3.zero;
+            //velocity[i] = test;
         }
 
-        var test = Vector3.zero;
-        velocity[i] = test;
+
 
         /*
         if (found > 0) {
@@ -44,4 +52,37 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         }*/
 
     }
+
+    /*
+    // takes first ray that doesnt hit anything as direction
+    // prob: physics baby 
+    // sol: end my fucking life
+    Vector3 ObstacleRays() {
+        Vector3[] rayDirections = BoidHelper.directions;
+
+        for (int i = 0; i < rayDirections.Length; i++) {
+            Vector3 dir = cachedTransform.TransformDirection(rayDirections[i]);
+            Ray ray = new Ray(Transform.position, dir);
+            if (!Physics.SphereCast(ray, settings.boundsRadius, settings.collisionAvoidDst, settings.obstacleMask)) {
+                return dir;
+            }
+        }
+
+        return forward;
+    }
+
+
+    */
+
+
+
+
+
+
+
+
+
+
 }
+
+

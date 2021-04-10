@@ -176,7 +176,7 @@ public class BoidManager : MonoBehaviour {
             RaycastHit hit;
             // True when the sphere sweep intersects any collider, otherwise false. 
             if (Physics.SphereCast(BoidsPositionArray[i], 2, VelocitiesArray[i], out hit, raycastDistance)) {
-                
+                hitNormals[i] = hit.normal;
                 isHitObstacles[i] = true;
               //  Debug.Log(isHitObstacles[i]);
                 // return true;
@@ -245,7 +245,7 @@ public class BoidManager : MonoBehaviour {
         };
 
         AvoidObjJob = new BoidAvoidObjJob() {
-        
+            deltaTime = Time.deltaTime,
             isHitObstacles = isHitObstacles,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
