@@ -16,9 +16,9 @@ public class ContactDamage : MonoBehaviour
     }
     private void OnCollisionEnter(Collision col)
     {
-        Debug.Log("collision");
-        Debug.Log(col.gameObject.tag);
-        Debug.Log(col.gameObject);
+        //Debug.Log("collision");
+        //Debug.Log(col.gameObject.tag);
+        //Debug.Log(col.gameObject);
         //Just if collision with body and prevent 2 hits at same time
         if (col.gameObject.tag == "shark" && col.collider.gameObject.tag == "body" && timeSinceLastHit > 2f) 
         {
@@ -26,7 +26,7 @@ public class ContactDamage : MonoBehaviour
             
             timeSinceLastHit = 0f;
 
-            Debug.Log("hit");
+            //Debug.Log("hit");
             this.healthSystem.InflictDamage(this.damage);
         }
     }
