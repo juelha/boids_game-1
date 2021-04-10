@@ -4,15 +4,27 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public CharacterController controller;
+    //public CharacterController controller;
     public float speed = 3f;
     public float slowDownFor = 3f;
     public float speedUpFor = 3f;
     public float waitForNextSpeed = 5f;
     private bool isFast = false;
 
+    private AudioSource speedSound;
+    private Rigidbody rb;
+    // Start is called before the first frame update
+    //public float sensibility;
+
+    void Start()
+    {
+        rb = this.GetComponent<Rigidbody>();
+        speedSound = this.GetComponent<AudioSource>();
+    }
+
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (GameState.GetState() != GameState.State.Playing)
         {
@@ -28,9 +40,11 @@ public class PlayerMovement : MonoBehaviour
         // if movement would be directed backwards (negative z), player can't move in that direction
         if (z < 0) z = 0;
 
-        Vector3 move = transform.right * x + transform.forward * z;
+        //slower left and right
+        Vector3 move = rb.transform.right * x / 3 + rb.transform.forward * z;
 
-        controller.Move(move * speed * Time.deltaTime);
+        //controller.Move(move * speed * Time.deltaTime);
+        rb.AddForce(move * speed * Time.deltaTime, ForceMode.VelocityChange);
 
         // check for upper boundary (water surface, currently at y = 8.5)
         // because the distance btw surface and shark is measured from the midpoint of the shark model
@@ -61,16 +75,20 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator speedUpTime(float time, float wait)
     {
         speed *= 2;
+        speedSound.Play();
         isFast = true;
         yield return new WaitForSeconds(time);
+
         speed /= 2;
         yield return new WaitForSeconds(wait);
         isFast = false;
     }
 
+
     //Slow down function
     IEnumerator slowDownTime(float time)
     {
+
         speed /= 2;
         yield return new WaitForSeconds(time);
         speed *= 2;
