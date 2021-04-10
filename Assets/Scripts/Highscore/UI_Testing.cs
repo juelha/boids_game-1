@@ -1,14 +1,4 @@
-﻿/* 
-    ------------------- Code Monkey -------------------
-
-    Thank you for downloading this package
-    I hope you find it useful in your projects
-    If you have any questions let me know
-    Cheers!
-
-               unitycodemonkey.com
-    --------------------------------------------------
- */
+﻿
 
 using System.Collections;
 using System.Collections.Generic;
@@ -20,58 +10,33 @@ public class UI_Testing : MonoBehaviour {
 
     [SerializeField] private HighscoreTable highscoreTable;
 
-    private void Start() {
-        
+    private void Start()
+    {
 
-
-        //if you want type in your score manuel, with button
-
-        //transform.Find("submitScoreBtn").GetComponent<Button_UI>().ClickFunc = () => {
+        //Unterscheiden, ob zum Ersten Mal gespielt wird oder ob ein Level beendet wurde, nur dann muss der highscore angegeben werden
+        if (PlayerPrefs.GetString("event", "start") != "start")
+        {
+            //erneut auf start setzten, falls während dem Spiel unterbrochen wird, am Ende dann auf "finished"
+            PlayerPrefs.SetString("event", "start");
             UI_Blocker.Show_Static();
 
-            //UI_InputWindow.Show_Static("Score", 0, () => {
-                // Clicked Cancel
-               // UI_Blocker.Hide_Static();
-            //}, (int score) => {
-                // Clicked Ok
-                UI_InputWindow.Show_Static("Player Name", "", "ABCDEFGIJKLMNOPQRSTUVXYWZabcdefghijklmnopqrstuvwxyz", 3, () => { 
-                    // Cancel
-                    UI_Blocker.Hide_Static();
-                }, (string nameText) => { 
-                    // Ok
-                    UI_Blocker.Hide_Static();
-                    int score = PlayerPrefs.GetInt("ActScore", 10);
-                    highscoreTable.AddHighscoreEntry(score, nameText);
-                });
-            //});
-       // }; 
+            UI_InputWindow.Show_Static("Player Name", "", "ABCDEFGIJKLMNOPQRSTUVXYWZabcdefghijklmnopqrstuvwxyz", 3, () =>
+            {
+                // Cancel
+                UI_Blocker.Hide_Static();
+            }, (string nameText) =>
+            {
+                // Ok
+                UI_Blocker.Hide_Static();
+
+                //Get last score
+                int score = PlayerPrefs.GetInt("ActScore", 0);
+                //Set last score to 0
+                PlayerPrefs.SetInt("ActScore", 0);
+                highscoreTable.AddHighscoreEntry(score, nameText);
+            });
+
+        }
     }
 }
 
-/*
-     private void Start() {
-        
-
-
-        //if you want type in your score manuel, with button
-
-        transform.Find("submitScoreBtn").GetComponent<Button_UI>().ClickFunc = () => {
-            UI_Blocker.Show_Static();
-
-            UI_InputWindow.Show_Static("Score", 0, () => {
-                // Clicked Cancel
-                UI_Blocker.Hide_Static();
-            }, (int score) => {
-                // Clicked Ok
-                UI_InputWindow.Show_Static("Player Name", "", "ABCDEFGIJKLMNOPQRSTUVXYWZabcdefghijklmnopqrstuvwxyz", 3, () => { 
-                    // Cancel
-                    UI_Blocker.Hide_Static();
-                }, (string nameText) => { 
-                    // Ok
-                    UI_Blocker.Hide_Static();
-                    highscoreTable.AddHighscoreEntry(score, nameText);
-                });
-            });
-        }; 
-    }
- */
