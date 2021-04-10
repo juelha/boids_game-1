@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float waitForNextSpeed = 5f;
     private bool isFast = false;
 
-
+    private AudioSource speedSound;
     private Rigidbody rb;
     // Start is called before the first frame update
     //public float sensibility;
@@ -19,6 +19,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = this.GetComponent<Rigidbody>();
+        speedSound = this.GetComponent<AudioSource>();
     }
 
 
@@ -74,8 +75,10 @@ public class PlayerMovement : MonoBehaviour
     IEnumerator speedUpTime(float time, float wait)
     {
         speed *= 2;
+        speedSound.Play();
         isFast = true;
         yield return new WaitForSeconds(time);
+
         speed /= 2;
         yield return new WaitForSeconds(wait);
         isFast = false;
@@ -85,6 +88,7 @@ public class PlayerMovement : MonoBehaviour
     //Slow down function
     IEnumerator slowDownTime(float time)
     {
+
         speed /= 2;
         yield return new WaitForSeconds(time);
         speed *= 2;
