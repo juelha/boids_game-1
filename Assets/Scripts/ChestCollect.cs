@@ -16,11 +16,14 @@ public class ChestCollect : MonoBehaviour
     public int pointsForOneChest = 10;
 
     private int _chestCountAll = 0;
+
+    private AudioSource chestOpenSound;
     // Start is called before the first frame update
     void Start()
     {
         _chestCountAll = chests.childCount;
         DisplayChestsUI();
+        chestOpenSound = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -42,6 +45,9 @@ public class ChestCollect : MonoBehaviour
         {
             _chestsCollected += 1;
             DisplayChestsUI();
+
+            //Play Sound
+            chestOpenSound.Play();
 
             //change Color
             Material thisChest = col.gameObject.GetComponentInChildren<Renderer>().material;
