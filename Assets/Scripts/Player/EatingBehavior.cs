@@ -36,13 +36,23 @@ public class EatingBehavior : MonoBehaviour
     public AudioClip eat4;
     private AudioSource eatingSound;
 
+
+
+
     //Immer nur einen auf einmal
     //private bool amFressen = false;
     // Start is called before the first frame update
     void Start()
     {
+
+        //Aktuel Score for Highscore List:
+        PlayerPrefs.SetInt("ActScore", 0);
         this.score = 0;
-        this.highScore.text = "HighScore: " + PlayerPrefs.GetInt("HighScore", 0);
+
+        //Display Highscore
+        float best = PlayerPrefs.GetInt("Best", 0);
+        this.highScore.text = "HighScore: " + best;
+        //this.highScore.text = "HighScore: " + PlayerPrefs.GetInt("HighScore", 0);
 
         //Add Audio Source
         eatingSound = gameObject.AddComponent<AudioSource>();
@@ -103,9 +113,9 @@ public class EatingBehavior : MonoBehaviour
 
     private void HighScore()
     {
-        if (this.score > PlayerPrefs.GetInt("HighScore", 0))
+        if (this.score > PlayerPrefs.GetInt("Best", 0))
         {
-            PlayerPrefs.SetInt("HighScore", this.score);
+            //PlayerPrefs.SetInt("HighScore", this.score);
             highScore.text = "HighScore: " + this.score.ToString();
         }
     }
@@ -118,6 +128,8 @@ public class EatingBehavior : MonoBehaviour
         //shows your benefit for 3 secs
         StartCoroutine(DisplayAddScoreUI(plusScore, 3f));
         DisplayScoreUI();
+
+        PlayerPrefs.SetInt("ActScore", this.score);
     }
     public void DisplayScoreUI()
     {
@@ -234,4 +246,5 @@ public class EatingBehavior : MonoBehaviour
         Destroy(coll.gameObject, time);
 
     }
+
 }

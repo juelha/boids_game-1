@@ -93,6 +93,7 @@ public class GameState : MonoBehaviour
 
     private static void LoadMainMenu()
     {
+        PlayerPrefs.SetString("event", "finished");
         SceneManager.LoadScene("MainMenu");
     }
 
