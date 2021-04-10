@@ -41,7 +41,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
                                                                            // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
 
 
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+          //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
             Debug.Log("avoidanceVector");
             Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];

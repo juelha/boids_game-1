@@ -67,7 +67,7 @@ public class BoidManager : MonoBehaviour {
     }
 
    
-    private void Update() {  // TODO FixedUpdate()
+    private void FixedUpdate() {  // TODO FixedUpdate()
 
 
         // DATA CONTAINERS
@@ -78,8 +78,8 @@ public class BoidManager : MonoBehaviour {
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
         // raycast data containers
-       // raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.Persistent); // Allocator.TempJob);
-      //  raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.Persistent); // Allocator.TempJob);
+        NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
 
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ public class BoidManager : MonoBehaviour {
             transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
             // raycast commands array init -> per boid one command 
-           // raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
@@ -132,7 +132,7 @@ public class BoidManager : MonoBehaviour {
         */
 
         // Schedule--------------------------------------------------------
-        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray, AvoidObjJobHandle);//, handle);
+        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);//, handle);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
         //StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
         AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, CohesionJobHandle);
@@ -173,44 +173,65 @@ public class BoidManager : MonoBehaviour {
         BoidRaycastCommandJobs RaycastCommandJobs;
 
 
-     /*   RaycastCommandJobs = new BoidRaycastCommandJobs() {
+        RaycastCommandJobs = new BoidRaycastCommandJobs() {
             raycastDistance = raycastDistance,
             positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
             velocities = VelocitiesArray,
             // positions = BoidsPositionArray,
             Raycasts = raycastCommandsArray,
-            isHitObstacles = isHitObstacles,
+            //   isHitObstacles = isHitObstacles,
             //  Hits = raycastHitsArray,
             //layerMask = avoidanceLayer
         }; // 104
-     */
+     
 
         // Schedule the batch of raycasts
         // Schedule the batch of raycasts
-// JobHandle handle;
+ JobHandle handle;
         //   handle = RaycastCommandJobs.Schedule();// raycastCommandsArray, raycastHitsArray, 32);
-// handle = RaycastCommandJobs.Schedule(number, 32); 
-      //  handle = RaycastCommandJobs.ScheduleBatch(number, 32);
-       // handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, number, default(JobHandle));
+        var setupDependency = RaycastCommandJobs.Schedule(number, 32); 
+        handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency); 
+        //  handle = RaycastCommandJobs.ScheduleBatch(number, 32);
+        // handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, number, default(JobHandle));
         // var setupDependency = raycastJobs.Schedule(number, 32);
         //  JobHandle raycastHandle;// = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32);//, setupDependency);
         // Wait for the batch processing job to complete
 
 
-       // JobHandle handle = _RaycastCommandJobs.Schedule(TransformAccessArray); 
+        // JobHandle handle = _RaycastCommandJobs.Schedule(TransformAccessArray); 
         //  raycastHandle = _RaycastCommandJobs.Schedule(TransformAccessArray);
         //   raycastHandle = // need raycastHitsArray
 
-//  handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+        handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------------------------------------------------------------
         
+
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
             RaycastHit hit;
+            hit = raycastHitsArray[i];
             // True when the sphere sweep intersects any collider, otherwise false. 
-            if (Physics.SphereCast(BoidsPositionArray[i], 2, VelocitiesArray[i], out hit, raycastDistance)) {
+            if (hit.collider) {
                 hitNormals[i] = hit.normal; 
                 isHitObstacles[i] = true; // setting up isHitObstacles Array
                 Debug.Log("hitNormals[i]");
@@ -222,13 +243,15 @@ public class BoidManager : MonoBehaviour {
             }
         }
 
+        
 
-
+         raycastCommandsArray.Dispose();
+         raycastHitsArray.Dispose();
 
 
         // RAYCAST END-----------------------------------------------------------------------------------------------------------------------
 
-         AvoidObjJob = new BoidAvoidObjJob() {
+        AvoidObjJob = new BoidAvoidObjJob() {
             deltaTime = Time.deltaTime,
             isHitObstacles = isHitObstacles,
             hitNormals = hitNormals,
@@ -261,9 +284,7 @@ public class BoidManager : MonoBehaviour {
         TransformAccessArray.Dispose();
 
 
-      //  raycastCommandsArray.Dispose();
-       // raycastHitsArray.Dispose();
-
+      
 
 
 

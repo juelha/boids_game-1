@@ -30,7 +30,7 @@ public struct BoidCohesionJob : IJobParallelForTransform {
         if (found > 0) {
             average_cohesion /= found;  // normalizing
             average_cohesion *= weight;  // change for getting desired effect in flock behavior
-            //velocity[i] += average_cohesion;
+            velocity[i] += average_cohesion;
         }
 
 
