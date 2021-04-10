@@ -32,7 +32,7 @@ public struct BoidAlignmentJob : IJobParallelForTransform {
         if (found > 0) {
             average_alignment /= found;   // normalizing
             average_alignment *= weight;  // change for getting desired effect in flock behavior
-            velocity[i] += average_alignment;
+          //  velocity[i] += average_alignment;
         }
     }
 }

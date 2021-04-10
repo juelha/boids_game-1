@@ -168,21 +168,22 @@ public class BoidManager : MonoBehaviour {
            // Debug.DrawRay(BoidsPositionArray[i], VelocitiesArray[i] * raycastDistance, Color.yellow);
         }
 
-        
 
+        // setting up isHitObstacles Array------------------------------------------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
            // var hit = raycastHitsArray[i];
             RaycastHit hit;
+            // True when the sphere sweep intersects any collider, otherwise false. 
             if (Physics.SphereCast(BoidsPositionArray[i], 2, VelocitiesArray[i], out hit, raycastDistance)) {
                 
                 isHitObstacles[i] = true;
-                Debug.Log(isHitObstacles[i]);
+              //  Debug.Log(isHitObstacles[i]);
                 // return true;
             }
             else {
                 isHitObstacles[i] = false;
-                Debug.Log(isHitObstacles[i]);
+             //   Debug.Log(isHitObstacles[i]);
             }
             
             // transform.up = VelocitiesArray[i];
@@ -289,12 +290,12 @@ public class BoidManager : MonoBehaviour {
         hitNormals.Dispose();
         isHitObstacles.Dispose();
 
-        // figure out where to do this
+        // UPDATE BOID-------------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
             if (VelocitiesArray[i].magnitude > maxVelocity) {
                 VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
             }
-             TransformAccessArray[i].up = VelocitiesArray[i];
+             TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
             TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
         }
 

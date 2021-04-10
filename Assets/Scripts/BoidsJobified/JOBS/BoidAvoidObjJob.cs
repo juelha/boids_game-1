@@ -19,20 +19,29 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         var avoidanceVector = Vector3.zero;
         var found = 0;
 
+        Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
+        // at this point we know if boid is about to hit sth 
         if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
-           // avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);  // just making shit up at this point
-            avoidanceVector = (-velocity[i]);
-            Debug.Log(velocity[i]);
+                                  // avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);  // just making shit up at this point
+            //Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);
+           // avoidanceVector = (-velocity[i]);
+           // transform.rotation = Quaternion.LookRotation(transform.position + Vector3.up,- velocity[i]);
+            Debug.Log(isHitObstacles[i]);
+           // velocity[i] = Vector3.Reflect(velocity[i], Vector3.right);
             found++;
+           
         }
 
+        var test = Vector3.zero;
+        velocity[i] = test;
 
+        /*
         if (found > 0) {
             avoidanceVector /= found;  // normalizing
             avoidanceVector *= weight; // change for getting desired effect in flock behavior
             velocity[i] *= -1 ; // opposite direction
-        }
+        }*/
 
     }
 }

@@ -34,7 +34,7 @@ public struct BoidAvoidPlayerJob : IJobParallelForTransform {  // IJobParallelFo
 
         if (found > 0) {
             avoidanceVector /= found;
-            velocity[i] += avoidanceVector; // bug here?
+         //   velocity[i] += avoidanceVector; // bug here?
 
         }
     }

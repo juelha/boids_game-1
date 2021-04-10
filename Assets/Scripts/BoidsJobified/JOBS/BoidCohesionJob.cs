@@ -31,7 +31,12 @@ public struct BoidCohesionJob : IJobParallelForTransform {
             average_cohesion /= found;  // normalizing
             average_cohesion *= weight;  // change for getting desired effect in flock behavior
             velocity[i] += average_cohesion;
-        } 
+        }
+
+
+        var test = Vector3.zero;
+       // velocity[i] = test;
+
     }
 
 
