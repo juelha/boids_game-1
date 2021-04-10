@@ -4,17 +4,19 @@ using UnityEngine.Jobs;
 using Unity.Collections;
 
 [BurstCompile]
-public struct BoidCohesionJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
+public struct BoidCohesionJob : IJobParallelForTransform { 
 
-    public float radius;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     public NativeArray<Vector3> velocity;
 
     public void Execute(int i, TransformAccess transform) {
 
+        // in case of disaster change these:
+        int radius = 10;
+        int weight = 5;
+
         var average_cohesion = Vector3.zero;
         var found = 0;
-        radius = 5; // change here
 
         // loops over all transforms 
         for (int j = 0; j < BoidsPositionArray.Length; j++) {     
@@ -22,13 +24,12 @@ public struct BoidCohesionJob : IJobParallelForTransform {  // IJobParallelFor c
             var diff = curPosition - transform.position;
             if ((diff.magnitude < radius) && (diff.magnitude > 0)) { // checks if in radius && not itself
                 average_cohesion += diff;
-                found += 1;
-
-
+                found++;
             }
         }
         if (found > 0) {
-            average_cohesion = average_cohesion / found;
+            average_cohesion /= found;  // normalizing
+            average_cohesion *= weight;  // change for getting desired effect in flock behavior
             velocity[i] += average_cohesion;
         } 
     }

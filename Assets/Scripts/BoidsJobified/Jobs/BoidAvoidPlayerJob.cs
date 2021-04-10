@@ -4,7 +4,7 @@ using UnityEngine.Jobs;
 using Unity.Collections;
 
 [BurstCompile]
-public struct BoidPlayerAvoidJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
+public struct BoidAvoidPlayerJob : IJobParallelForTransform {  // IJobParallelFor can run same logic over a list of items
 
     public Vector3 playerPosition;
    // public GameObject playerObj;

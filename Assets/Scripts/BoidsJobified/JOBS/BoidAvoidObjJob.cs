@@ -6,20 +6,18 @@ using Unity.Collections;
 
 public struct BoidAvoidObjJob : IJobParallelForTransform {
 
-    public float radius;
-   // [ReadOnly] public NativeArray<Vector3> NearbyObjsPositionArray;  // init with ray casting in boid manager
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
     [ReadOnly] public NativeArray<Vector3> hitNormals;
 
- //   [ReadOnly] public NativeArray<bool> withinBounds;
-   // [ReadOnly] public NativeArray<bool> turnings;
 
     public void Execute(int i, TransformAccess transform) {
 
+        // in case of disaster change these:
+        int weight = 12;
+
         var avoidanceVector = Vector3.zero;
         var found = 0;
-        radius = 5; // change here
 
 
         if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
@@ -27,22 +25,10 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             found++;
         }
 
-        /*
-            // loops over all postions 
-            for (int j = 0; j < NearbyObjsPositionArray.Length; j++) {
-            var curPosition = NearbyObjsPositionArray[j];
-            var diff = curPosition - transform.position;
-            if ((diff.magnitude < radius) && (diff.magnitude > 0)) { // checks if in radius && not itself
-                var curVelocity = NearbyObjsPositionArray[j];
-                avoidanceVector += curVelocity;
-                found += 1;
-            }
-        }
-        */
 
         if (found > 0) {
-            avoidanceVector /= found;
-            avoidanceVector *= 1000;
+            avoidanceVector /= found;  // normalizing
+            avoidanceVector *= weight; // change for getting desired effect in flock behavior
             velocity[i] += avoidanceVector;
         }
 

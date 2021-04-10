@@ -19,13 +19,11 @@ public class BoidManager : MonoBehaviour {
     // RADIUS TO CHANGE IN EDITOR -> can be taken out here and assigned manually in each script 
     public float StartRadius;
 
-    public float AlignmentRadius;
-    public float CohesionRadius;
-    public float StayinRadius;
     public float PlayerAvoidRadius;
 
     public int number;
     public float maxVelocity;
+    public float AgentDensity;
 
     // DATA CONTAINERS
     TransformAccessArray TransformAccessArray;
@@ -46,7 +44,7 @@ public class BoidManager : MonoBehaviour {
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
     public BoidStayinRadiusJob StayinRadiusJob;
-    public BoidPlayerAvoidJob PlayerAvoidJob;
+    public BoidAvoidPlayerJob AvoidPlayerJob;
     public BoidAvoidObjJob AvoidObjJob;
 
     public BoidUpdateJob UpdateJob;
@@ -55,20 +53,13 @@ public class BoidManager : MonoBehaviour {
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
     JobHandle StayinRadiusJobHandle;
-    JobHandle PlayerAvoidJobHandle;
+    JobHandle AvoidPlayerJobHandle;
     JobHandle AvoidObjJobHandle;
 
     JobHandle UpdateJobHandle;
 
 
     void Start() {
-
-        // init radius 
-        StartRadius = 10;
-        AlignmentRadius = 50;
-        CohesionRadius = 100;
-        StayinRadius = 100;
-        PlayerAvoidRadius = 7;
 
         // init player
         if (gameObject.tag == "Player") { 
@@ -88,7 +79,8 @@ public class BoidManager : MonoBehaviour {
 
         for (int i = 0; i < number; ++i) {
 
-            goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius, Random.rotation));
+            // Random.insideUnitSphere * startingCount * AgentDensity,
+            goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius  * AgentDensity, Random.rotation));
          
             // ref to current gameobject 
             var obj = goList[i];
@@ -201,24 +193,21 @@ public class BoidManager : MonoBehaviour {
         AlignmentJob = new BoidAlignmentJob() {
         BoidsPositionArray = BoidsPositionArray,
         velocity = VelocitiesArray,
-        radius = AlignmentRadius,
         };
 
         CohesionJob = new BoidCohesionJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
-            radius = CohesionRadius,
         };
 
         // /*
         StayinRadiusJob = new BoidStayinRadiusJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
-            radius = StayinRadius,
         };
         //  */
 
-        PlayerAvoidJob = new BoidPlayerAvoidJob() {
+        AvoidPlayerJob = new BoidAvoidPlayerJob() {
             playerPosition = playerPosition,
             velocity = VelocitiesArray,
             radius = PlayerAvoidRadius,
@@ -228,7 +217,6 @@ public class BoidManager : MonoBehaviour {
             isHitObstacles = isHitObstacles,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
-            radius = PlayerAvoidRadius,
         };
 
 
@@ -241,8 +229,8 @@ public class BoidManager : MonoBehaviour {
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray, raycastHandle);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
         StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
-        PlayerAvoidJobHandle = PlayerAvoidJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, PlayerAvoidJobHandle);
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, StayinRadiusJobHandle);
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, AvoidPlayerJobHandle);
 
 
         // update gets called in the end and uses the changed velocities to move obj with transform
@@ -259,7 +247,7 @@ public class BoidManager : MonoBehaviour {
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
         StayinRadiusJobHandle.Complete();
-        PlayerAvoidJobHandle.Complete();
+        AvoidPlayerJobHandle.Complete();
         AvoidObjJobHandle.Complete();
 
         UpdateJobHandle.Complete();
