@@ -29,20 +29,39 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);
            // avoidanceVector = (-velocity[i]);
            // transform.rotation = Quaternion.LookRotation(transform.position + Vector3.up,- velocity[i]);
-            Debug.Log(isHitObstacles[i]);
+          //  Debug.Log(isHitObstacles[i]);
            // velocity[i] = Vector3.Reflect(velocity[i], Vector3.right);
             found++;
 
-            // calc new vector: 
-            avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+            Debug.Log("velocity[i]");
+            Debug.Log(velocity[i]);
 
+            // calc new vector: 
+            avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]); // doesnt do what i want it to
+                                                                           // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+            Debug.Log("avoidanceVector");
+            Debug.Log(avoidanceVector);
+            //avoidanceVector = hitNormals[i];
+          //  avoidanceVector *= 10000;
             velocity[i] += avoidanceVector; 
-            //  var test = Vector3.zero;
-            //velocity[i] = test;
+             var test = Vector3.zero;
+            // velocity[i] = test;
+
+
+            Debug.Log("velocity[i] AFTER");
+            Debug.Log(velocity[i]);
+
+            //setting vector pointing away from neighbor
+            //  avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
+
+
+
         }
 
-
+        
 
         /*
         if (found > 0) {
@@ -84,5 +103,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
 
 }
+
+
 
 
