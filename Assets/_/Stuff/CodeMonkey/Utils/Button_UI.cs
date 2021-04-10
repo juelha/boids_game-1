@@ -127,7 +127,7 @@ namespace CodeMonkey.Utils {
         void Awake() {
             posExit = transform.localPosition;
             posEnter = (Vector2)transform.localPosition + hoverBehaviour_Move_Amount;
-            SetHoverBehaviourType(hoverBehaviourType);
+            //SetHoverBehaviourType(hoverBehaviourType);
 
 #if SOUND_MANAGER
             // Sound Manager
@@ -141,12 +141,13 @@ namespace CodeMonkey.Utils {
             internalOnPointerExitFunc += () => { if (cursorMouseOut != CursorManager.CursorType.None) CursorManager.SetCursor(cursorMouseOut); };
 #endif
         }
+        
         public void SetHoverBehaviourType(HoverBehaviour hoverBehaviourType) {
             this.hoverBehaviourType = hoverBehaviourType;
             switch (hoverBehaviourType) {
             case HoverBehaviour.Change_Color:
                 hoverBehaviourFunc_Enter = delegate () { hoverBehaviour_Image.color = hoverBehaviour_Color_Enter; };
-                //hoverBehaviourFunc_Exit = delegate () { hoverBehaviour_Image.color = hoverBehaviour_Color_Exit; };
+                hoverBehaviourFunc_Exit = delegate () { hoverBehaviour_Image.color = hoverBehaviour_Color_Exit; };
                 break;
             case HoverBehaviour.Change_Image:
                 hoverBehaviourFunc_Enter = delegate () { hoverBehaviour_Image.sprite = hoverBehaviour_Sprite_Enter; };
@@ -158,6 +159,7 @@ namespace CodeMonkey.Utils {
                 break;
             }
         }
+        
 
 
 

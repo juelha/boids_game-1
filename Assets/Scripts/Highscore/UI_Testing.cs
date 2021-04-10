@@ -29,7 +29,7 @@ public class UI_Testing : MonoBehaviour {
                 UI_Blocker.Hide_Static();
             }, (int score) => {
                 // Clicked Ok
-                UI_InputWindow.Show_Static("Player Name", "", "ABCDEFGIJKLMNOPQRSTUVXYWZ", 3, () => { 
+                UI_InputWindow.Show_Static("Player Name", "", "ABCDEFGIJKLMNOPQRSTUVXYWZabcdefghijklmnopqrstuvwxyz", 3, () => { 
                     // Cancel
                     UI_Blocker.Hide_Static();
                 }, (string nameText) => { 
