@@ -14,11 +14,13 @@ public class AgentHuntingBehavior : FilteredFlockBehavior
         {
             Debug.LogError("No player set to hunt");
         }
+        Vector3 huntingMove = Vector3.zero;
 
+        /*
        // Collider playerCollider = player.GetComponent<Collider>();
        // Vector3 closestPointofPlayer = playerCollider.ClosestPoint(agent.transform.position);
         Vector3 playerDistance = player.transform.position- agent.gameObject.transform.position;
-        Vector3 huntingMove = Vector3.zero;
+        
         Debug.Log("ATP:" + agent.gameObject.transform.position);
         Debug.Log("PTP:" + player.transform.position);
         Debug.Log("PD"+playerDistance);
@@ -31,6 +33,11 @@ public class AgentHuntingBehavior : FilteredFlockBehavior
 
         huntingMove = huntingMove.normalized;
         Debug.Log(huntingMove);
+       
+        */
+        Vector3 playerPosition = player.gameObject.transform.position;
+        Debug.Log("PlayerPos" + playerPosition);
+        
         return huntingMove;
     }
 }

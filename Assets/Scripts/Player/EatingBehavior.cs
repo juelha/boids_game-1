@@ -242,7 +242,7 @@ public class EatingBehavior : MonoBehaviour
             gametime += 10f;
 
             //Destroy
-            DestroyBoidAfter(3f, col);
+            DestroyBoidAfter(5f, col);
 
 
         }
@@ -250,20 +250,39 @@ public class EatingBehavior : MonoBehaviour
 
     private void DestroyBoidAfter(float time, Collider coll)
     {
+        Transform playerTransform = player.gameObject.transform;
+        Transform boidTransform = coll.gameObject.transform;
         //Highlight boid
         Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
         boid.SetColor("_Color", Color.red);
-
+       
+        /*
         //Destroy all movement skripts
         Destroy(coll.gameObject.GetComponent<BoidAlignment>());
         Destroy(coll.gameObject.GetComponent<BoidCohesion>());
         Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
         Destroy(coll.gameObject.GetComponent<BoidSeparation>());
         Destroy(coll.gameObject.GetComponent<Boid>());
+        */
 
+        //Inhibits Boid movement
+        Destroy(coll.gameObject.GetComponent<FlockAgent>());
+        
+        //Set position to mouth of player
+        boidTransform.position = playerTransform.position + playerTransform.forward * 0.4f;
+
+        // Scale down the boids
+        boidTransform.localScale *= 0.5f;
+
+        Vector3 rotation = new Vector3(90f, 90f, 90f);
+        
+       
         //Set new Parent = Player
-        //coll.gameObject.transform.SetParent(player.gameObject.transform);
-
+        boidTransform.SetParent(playerTransform);
+        
+        //boidTransform.Rotate(rotation);
+        boidTransform.rotation = playerTransform.localRotation;
+        //debug.log("fix rotation of captured boids")
         Destroy(coll.gameObject, time);
 
     }

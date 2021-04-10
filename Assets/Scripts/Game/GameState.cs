@@ -113,7 +113,7 @@ public class GameState : MonoBehaviour
 
         string SCENE_LOADED_VIA_EDITOR = "4";
 
-        if (scene.name == "FelixBoidsScene"
+        if (scene.name == "SampleScene"
             && Application.isEditor
             && mode.ToString() == SCENE_LOADED_VIA_EDITOR)
         {
