@@ -27,7 +27,7 @@ public class EatingBehavior : MonoBehaviour
     public float minSize = 3f;
     public float increaseSize = 0.1f;
     public float decreaseSize = 0.0001f;
-
+    public float destroyBoidAfter = 2f;
 
     //sounds
     public AudioClip eat1;
@@ -208,7 +208,7 @@ public class EatingBehavior : MonoBehaviour
             PlayEatingSound();
             AddScore(1);
             //Destroy
-            DestroyBoidAfter(3f, col);
+            DestroyBoidAfter(destroyBoidAfter, col);
 
             //slow down when eat fish
             // player.slowDown();
@@ -229,7 +229,7 @@ public class EatingBehavior : MonoBehaviour
         Destroy(coll.gameObject.GetComponent<Boid>());
 
         //Set new Parent = Player
-        coll.gameObject.transform.SetParent(player.gameObject.transform);
+        //coll.gameObject.transform.SetParent(player.gameObject.transform);
 
         Destroy(coll.gameObject, time);
 
