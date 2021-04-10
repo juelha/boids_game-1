@@ -28,6 +28,14 @@ public class EatingBehavior : MonoBehaviour
     public float increaseSize = 0.1f;
     public float decreaseSize = 0.0001f;
 
+
+    //sounds
+    public AudioClip eat1;
+    public AudioClip eat2;
+    public AudioClip eat3;
+    public AudioClip eat4;
+    private AudioSource eatingSound;
+
     //Immer nur einen auf einmal
     //private bool amFressen = false;
     // Start is called before the first frame update
@@ -35,6 +43,9 @@ public class EatingBehavior : MonoBehaviour
     {
         this.score = 0;
         this.highScore.text = "HighScore: " + PlayerPrefs.GetInt("HighScore", 0);
+
+        //Add Audio Source
+        eatingSound = gameObject.AddComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -126,6 +137,28 @@ public class EatingBehavior : MonoBehaviour
         this.speed.text = player.speed.ToString("F2");
     }
 
+    private void PlayEatingSound()
+    {
+        int num = UnityEngine.Random.Range(1, 5);
+        Debug.Log(num);
+        switch (num)
+        {
+            case 1:
+                eatingSound.clip = eat1;
+                break;
+            case 2:
+                eatingSound.clip = eat2;
+                break;
+            case 3:
+                eatingSound.clip = eat3;
+                break;
+            case 4:
+                eatingSound.clip = eat4;
+                break;
+        }
+        eatingSound.Play();
+    }
+
     //private void OnCollisionEnter(Collision col)
     ////private void OnTriggerEnter(Collider col)
     //{
@@ -172,7 +205,7 @@ public class EatingBehavior : MonoBehaviour
                 }
             }
 
-
+            PlayEatingSound();
             AddScore(1);
             //Destroy
             DestroyBoidAfter(3f, col);
