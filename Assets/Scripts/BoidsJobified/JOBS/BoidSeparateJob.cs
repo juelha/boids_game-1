@@ -12,8 +12,8 @@ public struct BoidSeparateJob : IJobParallelForTransform {
     public void Execute(int i, TransformAccess transform) {
 
         // in case of disaster change these:
-        int radius = 10;
-        int weight = 5;
+        int radius = 5;
+        int weight = 20;
 
         var average_sep = Vector3.zero;
         var found = 0;

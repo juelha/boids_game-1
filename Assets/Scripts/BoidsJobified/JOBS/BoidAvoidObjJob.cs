@@ -33,8 +33,8 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
            // velocity[i] = Vector3.Reflect(velocity[i], Vector3.right);
             found++;
 
-            Debug.Log("velocity[i]");
-            Debug.Log(velocity[i]);
+         //   Debug.Log("velocity[i]");
+         //   Debug.Log(velocity[i]);
 
             // calc new vector: 
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]); // doesnt do what i want it to
@@ -42,8 +42,8 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
 
           //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
-            Debug.Log("avoidanceVector");
-            Debug.Log(avoidanceVector);
+          //  Debug.Log("avoidanceVector");
+         //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
           //  avoidanceVector *= 10000;
             velocity[i] += avoidanceVector; 
@@ -51,8 +51,8 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             // velocity[i] = test;
 
 
-            Debug.Log("velocity[i] AFTER");
-            Debug.Log(velocity[i]);
+           // Debug.Log("velocity[i] AFTER");
+           // Debug.Log(velocity[i]);
 
             //setting vector pointing away from neighbor
             //  avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
