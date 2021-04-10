@@ -40,20 +40,23 @@ public class BoidManager : MonoBehaviour {
    // public BoidRaycastCommandJobs RaycastCommandJobs;
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
-    public BoidStayinRadiusJob StayinRadiusJob;
+    public BoidSeparateJob SeparateJob;
+  //  public BoidStayinRadiusJob StayinRadiusJob;
     public BoidAvoidPlayerJob AvoidPlayerJob;
     public BoidAvoidObjJob AvoidObjJob;
 
-    public BoidUpdateJob UpdateJob;
+   //public BoidUpdateJob UpdateJob;
 
-    // JOBHANDLES 
-    JobHandle AlignmentJobHandle;
+    // JOBHANDLES
+    JobHandle AlignmentJobHandle;  
     JobHandle CohesionJobHandle;
-    JobHandle StayinRadiusJobHandle;
+    JobHandle SeparateJobHandle; 
+
+    //JobHandle StayinRadiusJobHandle;
     JobHandle AvoidPlayerJobHandle;
     JobHandle AvoidObjJobHandle;
 
-    JobHandle UpdateJobHandle;
+   // JobHandle UpdateJobHandle;
 
 
     void Start() {
@@ -67,7 +70,7 @@ public class BoidManager : MonoBehaviour {
     }
 
    
-    private void FixedUpdate() {  // TODO FixedUpdate()
+    private void Update() {  // TODO FixedUpdate()
 
 
         // DATA CONTAINERS
@@ -78,6 +81,7 @@ public class BoidManager : MonoBehaviour {
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
         // raycast data containers
+      //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
         NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
         NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
@@ -96,6 +100,7 @@ public class BoidManager : MonoBehaviour {
             transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
             // raycast commands array init -> per boid one command 
+           // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
         }
 
@@ -112,6 +117,11 @@ public class BoidManager : MonoBehaviour {
         };
 
         CohesionJob = new BoidCohesionJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
+
+        SeparateJob = new BoidSeparateJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
@@ -134,8 +144,9 @@ public class BoidManager : MonoBehaviour {
         // Schedule--------------------------------------------------------
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);//, handle);
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
+        SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
         //StayinRadiusJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
-        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, SeparateJobHandle);
 
 
 
@@ -152,6 +163,7 @@ public class BoidManager : MonoBehaviour {
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
+        SeparateJobHandle.Complete();
         // StayinRadiusJobHandle.Complete();
         AvoidPlayerJobHandle.Complete();
 
@@ -189,8 +201,11 @@ public class BoidManager : MonoBehaviour {
         // Schedule the batch of raycasts
  JobHandle handle;
         //   handle = RaycastCommandJobs.Schedule();// raycastCommandsArray, raycastHitsArray, 32);
-        var setupDependency = RaycastCommandJobs.Schedule(number, 32); 
-        handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency); 
+        var setupDependency = RaycastCommandJobs.Schedule(number, 32);
+
+        //  handle = SpherecastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
+        handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
+
         //  handle = RaycastCommandJobs.ScheduleBatch(number, 32);
         // handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, number, default(JobHandle));
         // var setupDependency = raycastJobs.Schedule(number, 32);
