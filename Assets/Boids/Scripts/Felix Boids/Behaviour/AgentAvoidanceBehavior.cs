@@ -29,10 +29,7 @@ public class AgentAvoidanceBehavior : FilteredFlockBehavior
                 nAvoid++;
                 //setting vector pointing away from neighbor
                 avoidanceMove += (Vector3)(agent.transform.position - closestPointofPlayer);
-                if(Vector3.SqrMagnitude(closestPointofPlayer - agent.transform.position) < 0.25f)
-                {
-                    Debug.Log("Boid gefressen");
-                }
+             
             }
         }
 

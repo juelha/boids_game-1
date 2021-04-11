@@ -225,26 +225,91 @@ public class EatingBehavior : MonoBehaviour
             //slow down when eat fish
             // player.slowDown();
         }
+        if (col.gameObject.tag == "XtraPointsBoid")
+        { 
+            //Increase shark, when he eats fish, but with maximum size
+            if (scaling)
+            {
+                transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+                if (transform.localScale.x > maxSize)
+                {
+                    transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+                }
+            }
+
+            PlayEatingSound();
+            AddScore(5);
+            //Destroy
+            DestroyBoidAfter(destroyBoidAfter, col);
+        }
+        if (col.gameObject.tag == "XtraTimeBoid")
+        {
+            //Increase shark, when he eats fish, but with maximum size
+            transform.localScale += new Vector3(1f, 1f, 0f) * increaseSize;
+            if (transform.localScale.x > maxSize)
+            {
+                transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
+            }
+
+            PlayEatingSound();
+            AddScore(1);
+            gametime += 10f;
+
+            //Destroy
+            DestroyBoidAfter(5f, col);
+        }
+
+
+
     }
 
     private void DestroyBoidAfter(float time, Collider coll)
     {
-        //Highlight boid
-        Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
-        boid.SetColor("_Color", Color.red);
+        Transform playerTransform = player.gameObject.transform;
+        Transform boidTransform = coll.gameObject.transform;
+        //Highlight boids_mat
+        Material boids_mat = coll.gameObject.GetComponentInChildren<Renderer>().material;
+        boids_mat.SetColor("_Color", Color.red);
 
+        /*
         //Destroy all movement skripts
         Destroy(coll.gameObject.GetComponent<BoidAlignment>());
         Destroy(coll.gameObject.GetComponent<BoidCohesion>());
         Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
         Destroy(coll.gameObject.GetComponent<BoidSeparation>());
         Destroy(coll.gameObject.GetComponent<Boid>());
+        */
+
+        //Inhibits Boid movement
+        Destroy(coll.gameObject.GetComponent<FlockAgent>());
+
+        //Set position to mouth of player
+        boidTransform.position = playerTransform.position + playerTransform.forward * 0.3f;
+
+        // Scale down the boids
+        boidTransform.localScale *= 0.5f;
+        
+        Vector3 _rot = new Vector3(0f, 90f, 0f);
+
+        var rotationVector = player.gameObject.GetComponentInChildren<Transform>().rotation.eulerAngles + _rot;
+        Debug.Log(rotationVector);
+        Vector3 _rotation = new Vector3(90f, 90f, 90f);
+        
+       
+        
+        coll.gameObject.GetComponentInChildren<Transform>().rotation = Quaternion.Euler(_rotation);
+        //boidTransform.rotation = playerTransform.localRotation;
+
 
         //Set new Parent = Player
-        //coll.gameObject.transform.SetParent(player.gameObject.transform);
+        boidTransform.SetParent(playerTransform);
 
+   
+        //debug.log("fix rotation of captured boids")
         Destroy(coll.gameObject, time);
 
     }
-
 }
+
+
+
