@@ -9,7 +9,7 @@ public struct BoidAvoidPlayerJob : IJobParallelForTransform {
     public float radius;
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
-    public NativeArray<Vector3> hitNormals;
+    [ReadOnly] public NativeArray<Vector3> hitNormals;
 
     public void Execute(int i, TransformAccess transform) {
 
@@ -40,9 +40,7 @@ public struct BoidAvoidPlayerJob : IJobParallelForTransform {
                                                                            // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
 
             avoidanceVector *= weight;
-            hitNormals[i] *= 10;
-
-            velocity[i] += hitNormals[i];
+            velocity[i] += avoidanceVector;
 
         }
 
