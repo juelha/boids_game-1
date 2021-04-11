@@ -29,6 +29,8 @@ public class EatingBehavior : MonoBehaviour
     public float decreaseSize = 0.0001f;
     public float destroyBoidAfter = 2f;
 
+    private float normalSpeed;
+
     //sounds
     public AudioClip eat1;
     public AudioClip eat2;
@@ -45,7 +47,7 @@ public class EatingBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        normalSpeed = player.speed;
         //Aktuel Score for Highscore List:
         PlayerPrefs.SetInt("ActScore", 0);
         this.score = 0;
@@ -147,7 +149,15 @@ public class EatingBehavior : MonoBehaviour
 
     private void DisplaySpeedUI()
     {
-        this.speed.text = player.speed.ToString("F2");
+        if(normalSpeed > 0)
+        {
+            this.speed.text = "Speed  X" + (player.speed / normalSpeed).ToString("");
+        }
+        else
+        {
+            //If speed is 0
+            this.speed.text = "";
+        }
     }
 
     private void PlayEatingSound()

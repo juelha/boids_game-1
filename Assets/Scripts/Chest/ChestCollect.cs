@@ -51,7 +51,7 @@ public class ChestCollect : MonoBehaviour
 
             //change Color
             Material thisChest = col.gameObject.GetComponentInChildren<Renderer>().material;
-            thisChest.SetColor("_Color", Color.red);
+            thisChest.SetColor("_Color", Color.green);
             Destroy(col.gameObject, 1f);
 
             //add score for chest,
