@@ -27,7 +27,7 @@ public class BoidManager : MonoBehaviour {
     NativeArray<Vector3> VelocitiesArray; // we need to be able to write to it in the jobs
 
     // RAYCAST STUFF
-    public ushort raycastDistance = 2;
+    public float raycastDistance = 0.04f;
 
 
     // JOBS 

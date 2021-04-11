@@ -5,7 +5,7 @@ using Unity.Collections;
 using UnityEngine.Jobs;
 
 struct BoidRaycastCommandJobs : IJobParallelFor {
-    [ReadOnly] public ushort raycastDistance;
+    [ReadOnly] public float raycastDistance;
     [ReadOnly] public NativeArray<Vector3> velocities;
     [ReadOnly] public NativeArray<Vector3> positions;
     //[ReadOnly] public LayerMask layerMask;
