@@ -20,7 +20,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         var found = 0;
         var rotationSpeed = 2;
 
-        Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
+     //   Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
         // at this point we know if boid is about to hit sth 
         if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
