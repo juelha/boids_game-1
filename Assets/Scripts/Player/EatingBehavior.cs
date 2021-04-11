@@ -202,29 +202,18 @@ public class EatingBehavior : MonoBehaviour
 
     IEnumerator AttackAnimation(float time)
     {
-        Debug.Log("Davor");
-        Debug.Log("Attack" + anim.GetCurrentAnimatorStateInfo(0).IsName("shark_attackanim"));
-        Debug.Log("Moving" + anim.GetCurrentAnimatorStateInfo(0).IsName("shark_moving"));
         //change animation
         anim.SetBool("Attack", true);
-        //anim.SetBool("Moving", false);
+        
 
         yield return new WaitForSeconds(time);
         anim.SetBool("Attack", false);
-        //anim.SetBool("Moving", true);
-
-        Debug.Log("Danach:");
-        Debug.Log("Attack" + anim.GetCurrentAnimatorStateInfo(0).IsName("shark_attackanim"));
-        Debug.Log("Moving" + anim.GetCurrentAnimatorStateInfo(0).IsName("shark_moving"));
+        
     }
 
     private void OnTriggerEnter(Collider col)
-    //private void OnTriggerEnter(Collider col)
-    {
-        //Debug.Log("collision");
-        //Debug.Log(col.gameObject.tag);
-        //Debug.Log(col.gameObject);
-        //Debug.Log("Tag Collider" + gameObject.tag);
+    { 
+
         if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
             //animation shark
