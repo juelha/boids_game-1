@@ -4,7 +4,6 @@ using Unity.Jobs;
 using Unity.Collections;
 using UnityEngine.Jobs;
 
-
 public class BoidManager : MonoBehaviour {
 
 
@@ -216,7 +215,8 @@ public class BoidManager : MonoBehaviour {
             hit = raycastHitsArray[i];
 
             // about to hit Player?
-            if (hit.collider.gameObject.tag == "Shark") {
+            if (hit.collider) {
+          //  if (hit.collider.gameObject.tag == "Shark") {
                 isHitPlayer[i] = true;
                 hitNormalsPlayer[i] = hit.normal;
             }
@@ -255,6 +255,7 @@ public class BoidManager : MonoBehaviour {
 
         //dispose raycast dc
         hitNormals.Dispose();
+        hitNormalsPlayer.Dispose();
         isHitObj.Dispose();
         isHitPlayer.Dispose();
 
