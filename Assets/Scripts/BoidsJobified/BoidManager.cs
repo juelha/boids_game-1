@@ -80,6 +80,9 @@ public class BoidManager : MonoBehaviour {
 
             var obj = goList[i];  // ref to current gameobject 
 
+          //  var obj = goList[i];  // ref to current gameobject 
+
+            //    obj.transform.position = VelocitiesArray[i];
             TransformTemp[i] = obj.transform;  // for TransformAccessArray
 
             BoidsPositionArray[i] = obj.transform.position;
@@ -265,8 +268,17 @@ public class BoidManager : MonoBehaviour {
             if (VelocitiesArray[i].magnitude > maxVelocity) {
                 VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
             }
+
+
+        //    var obj = goList[i];  // ref to current gameobject 
+
+          //  obj.transform.position = VelocitiesArray[i];
+           // VelocitiesArray[i] = obj.transform.forward * maxVelocity; // 
+            
             TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
             TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
+
+            
         }
 
         // trash can

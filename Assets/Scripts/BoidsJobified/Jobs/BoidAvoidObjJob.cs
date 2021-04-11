@@ -46,7 +46,6 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //avoidanceVector = hitNormals[i];
             //  avoidanceVector *= weight;
             velocity[i] += avoidanceVector;
-            var test = Vector3.zero;
             // velocity[i] = test;
 
 
