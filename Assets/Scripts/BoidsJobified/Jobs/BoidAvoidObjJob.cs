@@ -22,8 +22,10 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
         // at this point we know if boid is about to hit sth 
-        if (isHitObstacles[i]) {  
+        if (isHitObstacles[i]) {
             // calc new vector: 
+
+         //   Debug.Log("HIT");
 
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);
          //   avoidanceVector *= weight;

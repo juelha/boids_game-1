@@ -69,7 +69,9 @@ public class BoidManager : MonoBehaviour {
             var obj = goList[i];  // ref to current gameobject 
 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity;
-          //  obj.transform.up = VelocitiesArray[i];
+            //  obj.transform.up = VelocitiesArray[i];
+            Debug.Log("VEL");
+            Debug.Log(VelocitiesArray[i]);
         }
 
        
@@ -106,6 +108,7 @@ public class BoidManager : MonoBehaviour {
 
         // UPDATE BOID-------------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
+            
 
             // limit velocity
             if (VelocitiesArray[i].magnitude > maxVelocity) {
@@ -121,6 +124,9 @@ public class BoidManager : MonoBehaviour {
             TransformTemp[i] = obj.transform;  // for TransformAccessArray
             BoidsPositionArray[i] = obj.transform.position;
 
+            // update vel since we changed stuff
+           // VelocitiesArray[i] = obj.transform.position;// * maxVelocity;
+           // VelocitiesArray[i] = obj.transform.forward;// * maxVelocity;
 
             // raycast commands array init -> per boid one command 
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
@@ -130,9 +136,9 @@ public class BoidManager : MonoBehaviour {
 
             VelocitiesArrayPlayer[i] = -VelocitiesArray[i];
             // raycast commands array init -> per boid one command 
-            Debug.Log(BoidsPositionArray[i]);
-            Debug.Log(VelocitiesArrayPlayer[i]);
-            Debug.Log(raycastDistance);
+          //  Debug.Log(BoidsPositionArray[i]);
+          //  Debug.Log(VelocitiesArrayPlayer[i]);
+          //  Debug.Log(raycastDistance);
             raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
 
 
@@ -145,7 +151,7 @@ public class BoidManager : MonoBehaviour {
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
-        /*
+        
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
@@ -185,7 +191,7 @@ public class BoidManager : MonoBehaviour {
         SeparateJobHandle.Complete();
 
 
-        */
+        
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -223,6 +229,7 @@ public class BoidManager : MonoBehaviour {
 
             // about to hit Obj?
             if (hit.collider) {
+               // Debug.Log("HIT");
                 isHitObj[i] = true; // setting up isHitObj Array
                 hitNormals[i] = hit.normal;
             }
@@ -313,7 +320,7 @@ public class BoidManager : MonoBehaviour {
         isHitObj.Dispose();
         isHitPlayer.Dispose();
 
-        
+
 
         // problem we delete and do not save changed vel anywhere!!!!
         // trash can
@@ -321,7 +328,26 @@ public class BoidManager : MonoBehaviour {
         //  VelocitiesArray.Dispose();
         //  TransformAccessArray.Dispose();
 
+        /*
+        // UPDATE BOID-------------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
 
+            // limit velocity
+            if (VelocitiesArray[i].magnitude > maxVelocity) {
+                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
+            }
+
+            // use velocity to changes position
+            var obj = goList[i];  // ref to current gameobject 
+          //  obj.transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+            obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
+        }
+
+        */
+        for (int i = 0; i < number; i++) {
+            Debug.Log("VEL END OF UPDATE");
+            Debug.Log(VelocitiesArray[i]);
+        }
 
         // trash can
         TransformAccessArray.Dispose();
