@@ -16,6 +16,11 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         // in case of disaster change these:
         int weight = 12;
 
+    //   /// Vector3[] reflectedVector;
+    //    Vector3[] oppositeVel;
+
+         var reflectedVector = Vector3.zero;
+           var oppositeVel = Vector3.zero;
         var avoidanceVector = Vector3.zero;
         var found = 0;
         var rotationSpeed = 2;
@@ -36,7 +41,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //   Debug.Log(velocity[i]);
 
             // calc new vector: 
-            avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]); // doesnt do what i want it to
+            reflectedVector = Vector3.Reflect(velocity[i], hitNormals[i]); // doesnt do what i want it to
                                                                            // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
 
 
@@ -45,7 +50,11 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
             //  avoidanceVector *= weight;
-            velocity[i] += avoidanceVector;
+            velocity[i] = velocity[i] * (-1); 
+
+
+            velocity[i] += reflectedVector;
+            velocity[i] *= 20;
             // velocity[i] = test;
 
 
