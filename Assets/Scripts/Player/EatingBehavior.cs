@@ -234,11 +234,15 @@ public class EatingBehavior : MonoBehaviour
         boid.SetColor("_Color", Color.red);
 
         //Destroy all movement skripts
+        Destroy(coll.gameObject);
+        /*
+
         Destroy(coll.gameObject.GetComponent<BoidAlignment>());
         Destroy(coll.gameObject.GetComponent<BoidCohesion>());
         Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
         Destroy(coll.gameObject.GetComponent<BoidSeparation>());
         Destroy(coll.gameObject.GetComponent<Boid>());
+        */
 
         //Set new Parent = Player
         //coll.gameObject.transform.SetParent(player.gameObject.transform);
