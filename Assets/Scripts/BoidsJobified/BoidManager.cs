@@ -89,7 +89,7 @@ public class BoidManager : MonoBehaviour {
 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
 
-            transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+          //  transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
             // raycast commands array init -> per boid one command 
             // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
@@ -164,7 +164,7 @@ public class BoidManager : MonoBehaviour {
 
         // Schedule the batch of raycasts
         JobHandle handle;
-        var setupDependency = RaycastCommandJobs.Schedule(number, 32);
+        var setupDependency = RaycastCommandJobs.Schedule(number, 32, SeparateJobHandle);
         handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
 
         handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
@@ -235,6 +235,16 @@ public class BoidManager : MonoBehaviour {
         newVelocitiesArray.Dispose();
 
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        AvoidObjJob = new BoidAvoidObjJob() {
+            isHitObstacles = isHitObj,
+            hitNormals = hitNormals,
+            velocity = VelocitiesArray,
+        };
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handlePlayer);
+        AvoidObjJobHandle.Complete();
+
+
         AvoidPlayerJob = new BoidAvoidPlayerJob() {
 
             radius = avoidPlayerRadius,
@@ -243,17 +253,9 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
 
         };
-        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, handle);
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
         AvoidPlayerJobHandle.Complete();
 
-
-        AvoidObjJob = new BoidAvoidObjJob() {
-            isHitObstacles = isHitObj,
-            hitNormals = hitNormals,
-            velocity = VelocitiesArray,
-        };
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handle);
-        AvoidObjJobHandle.Complete();
 
 
         //dispose raycast dc
@@ -269,16 +271,15 @@ public class BoidManager : MonoBehaviour {
                 VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
             }
 
+            var obj = goList[i];  // ref to current gameobject 
+            obj.transform.up += VelocitiesArray[i]; // for TransformAccessArray
+            obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
 
-        //    var obj = goList[i];  // ref to current gameobject 
+            goList[i] = obj; 
+          //  TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
+          //  TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
 
-          //  obj.transform.position = VelocitiesArray[i];
-           // VelocitiesArray[i] = obj.transform.forward * maxVelocity; // 
-            
-            TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
-            TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
 
-            
         }
 
         // trash can
