@@ -161,6 +161,7 @@ public class BoidManager : MonoBehaviour {
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
         /*
+        
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,

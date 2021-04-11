@@ -14,7 +14,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
     public void Execute(int i, TransformAccess transform) {
 
         // in case of disaster change these:
-        int weight = 12;
+        int weight = 100;
 
         var avoidanceVector = Vector3.zero;
         var found = 0;
@@ -25,11 +25,11 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         if (isHitObstacles[i]) {
             // calc new vector: 
 
-         //   Debug.Log("HIT");
+           Debug.Log("HIT");
 
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);
             avoidanceVector *= weight;
-            velocity[i] += avoidanceVector;
+           velocity[i] += avoidanceVector;
           //  velocity[i] = avoidanceVector;
 
 
