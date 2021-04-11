@@ -6,7 +6,6 @@ using Unity.Collections;
 
 public struct BoidAvoidObjJob : IJobParallelForTransform {
 
-    public float deltaTime;
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
     [ReadOnly] public NativeArray<Vector3> hitNormals;
@@ -45,7 +44,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
           //  Debug.Log("avoidanceVector");
          //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
-          //  avoidanceVector *= 10000;
+          //  avoidanceVector *= weight;
             velocity[i] += avoidanceVector; 
              var test = Vector3.zero;
             // velocity[i] = test;

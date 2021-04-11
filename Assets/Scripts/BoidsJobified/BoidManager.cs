@@ -16,7 +16,7 @@ public class BoidManager : MonoBehaviour {
     // STUFF TO CHANGE IN EDITOR  
     public float StartRadius;
 
-    public float PlayerAvoidRadius;
+    public float avoidPlayerRadius;
 
     public int number;
     public float maxVelocity;
@@ -116,11 +116,7 @@ public class BoidManager : MonoBehaviour {
             velocity = VelocitiesArray,
         };
 
-        AvoidPlayerJob = new BoidAvoidPlayerJob() {
-          //  playerPosition = playerPosition,
-            velocity = VelocitiesArray,
-            radius = PlayerAvoidRadius,
-        };
+        
 
 
         // Schedule--------------------------------------------------------
@@ -128,7 +124,6 @@ public class BoidManager : MonoBehaviour {
         CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     
         SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
 
-        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, SeparateJobHandle);
 
 
 
@@ -144,19 +139,19 @@ public class BoidManager : MonoBehaviour {
         CohesionJobHandle.Complete();
         SeparateJobHandle.Complete();
 
-        AvoidPlayerJobHandle.Complete();
 
 
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
         // RAYCAST START---------------------------------------------------------------------------------------------------------------------------------------
-        NativeArray<bool> isHitObstacles = new NativeArray<bool>(number, Allocator.TempJob);
+        NativeArray<bool> isHitObj = new NativeArray<bool>(number, Allocator.TempJob);
+        NativeArray<bool> isHitPlayer = new NativeArray<bool>(number, Allocator.TempJob);
         NativeArray<Vector3> hitNormals = new NativeArray<Vector3>(number, Allocator.TempJob);
+        NativeArray<Vector3> hitNormalsPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
 
         // make job
         BoidRaycastCommandJobs RaycastCommandJobs;
-
 
         RaycastCommandJobs = new BoidRaycastCommandJobs() {
             raycastDistance = raycastDistance,
@@ -167,10 +162,7 @@ public class BoidManager : MonoBehaviour {
 
         // Schedule the batch of raycasts
         JobHandle handle;
-        //   handle = RaycastCommandJobs.Schedule();// raycastCommandsArray, raycastHitsArray, 32);
         var setupDependency = RaycastCommandJobs.Schedule(number, 32);
-
-        //  handle = SpherecastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
         handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
 
         handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
@@ -180,38 +172,91 @@ public class BoidManager : MonoBehaviour {
             // the collider that was hit 
             RaycastHit hit;
             hit = raycastHitsArray[i];
-            // True when the sphere sweep intersects any collider, otherwise false. 
+
+            // about to hit Obj?
             if (hit.collider) {
+                isHitObj[i] = true; // setting up isHitObj Array
                 hitNormals[i] = hit.normal; 
-                isHitObstacles[i] = true; // setting up isHitObstacles Array
-              //  Debug.Log("hitNormals[i]");
-               // Debug.Log(hitNormals[i]);
             }
             else {
-                isHitObstacles[i] = false;
-                //   Debug.Log(isHitObstacles[i]);
+                isHitObj[i] = false;
             }
+
         }
 
-         raycastCommandsArray.Dispose();
-         raycastHitsArray.Dispose();
 
+        //----------------------------------------------
+        BoidRaycastCommandJobs RaycastCommandJobsPlayer;
+        NativeArray<Vector3> newVelocitiesArray = new NativeArray<Vector3> (number, Allocator.TempJob);
+        for (int i = 0; i < number; i++) {
+            newVelocitiesArray[i]= - VelocitiesArray[i] ;
+
+        }
+
+        RaycastCommandJobsPlayer = new BoidRaycastCommandJobs() {
+            raycastDistance = raycastDistance,
+            positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
+            velocities = newVelocitiesArray,
+            Raycasts = raycastCommandsArray,
+        };
+
+        // Schedule the batch of raycasts
+        JobHandle handlePlayer;
+        var setupDependencyPlayer = RaycastCommandJobsPlayer.Schedule(number, 32, handle);
+        handlePlayer = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependencyPlayer);
+
+        handlePlayer.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+       
+
+
+        // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
+            // the collider that was hit 
+            RaycastHit hit;
+            hit = raycastHitsArray[i];
+
+            // about to hit Player?
+            if (hit.collider.gameObject.tag == "Shark") {
+                isHitPlayer[i] = true;
+                hitNormalsPlayer[i] = hit.normal;
+            }
+            else {
+                isHitPlayer[i]  = false;
+            }
+
+        }
+
+        // trash can
+        raycastCommandsArray.Dispose();
+        raycastHitsArray.Dispose();
+        newVelocitiesArray.Dispose();
 
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
+        AvoidPlayerJob = new BoidAvoidPlayerJob() {
+
+            radius = avoidPlayerRadius,
+            isHitObstacles = isHitPlayer,
+            hitNormals = hitNormalsPlayer,
+            velocity = VelocitiesArray,
+
+        };
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray,handle);
+        AvoidPlayerJobHandle.Complete();
+
 
         AvoidObjJob = new BoidAvoidObjJob() {
-            deltaTime = Time.deltaTime,
-            isHitObstacles = isHitObstacles,
+            isHitObstacles = isHitObj,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
         };
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray);
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handle);
         AvoidObjJobHandle.Complete();
 
 
         //dispose raycast dc
         hitNormals.Dispose();
-        isHitObstacles.Dispose();
+        isHitObj.Dispose();
+        isHitPlayer.Dispose();
 
 
         // UPDATE BOID-------------------------------------------------------------------------
@@ -223,7 +268,7 @@ public class BoidManager : MonoBehaviour {
             TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
         }
 
-        
+        // trash can
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
         TransformAccessArray.Dispose();
