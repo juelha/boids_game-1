@@ -85,6 +85,15 @@ public class BoidManager : MonoBehaviour {
 
     private void Update() {
 
+        // INIT 
+        for (int i = 0; i < number; ++i) {
+            //  obj.transform.up = VelocitiesArray[i];
+            Debug.Log("VEL");
+            Debug.Log(VelocitiesArray[i]);
+        }
+
+
+
         // DATA CONTAINERS
 
         // init arrays
@@ -126,7 +135,7 @@ public class BoidManager : MonoBehaviour {
 
             // update vel since we changed stuff
            // VelocitiesArray[i] = obj.transform.position;// * maxVelocity;
-           // VelocitiesArray[i] = obj.transform.forward;// * maxVelocity;
+            VelocitiesArray[i] = obj.transform.forward * maxVelocity;// * maxVelocity;
 
             // raycast commands array init -> per boid one command 
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
@@ -151,7 +160,7 @@ public class BoidManager : MonoBehaviour {
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
-        
+        /*
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
@@ -190,7 +199,7 @@ public class BoidManager : MonoBehaviour {
         CohesionJobHandle.Complete();
         SeparateJobHandle.Complete();
 
-
+        */
         
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -226,16 +235,19 @@ public class BoidManager : MonoBehaviour {
             // the collider that was hit 
             RaycastHit hit;
             hit = raycastHitsArray[i];
+            isHitObj[i] = raycastHitsArray[i].collider ? true : false;
+            hitNormals[i] = raycastHitsArray[i].normal;
 
+            /*
             // about to hit Obj?
             if (hit.collider) {
-               // Debug.Log("HIT");
+                Debug.Log("HIT");
                 isHitObj[i] = true; // setting up isHitObj Array
                 hitNormals[i] = hit.normal;
             }
             else {
                 isHitObj[i] = false;
-            }
+            }*/
 
         }
 

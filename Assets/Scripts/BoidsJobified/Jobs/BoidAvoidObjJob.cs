@@ -28,7 +28,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
          //   Debug.Log("HIT");
 
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]);
-         //   avoidanceVector *= weight;
+            avoidanceVector *= weight;
             velocity[i] += avoidanceVector;
           //  velocity[i] = avoidanceVector;
 
