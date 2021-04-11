@@ -234,6 +234,7 @@ public class EatingBehavior : MonoBehaviour
         boid.SetColor("_Color", Color.red);
 
         //Destroy all movement skripts
+        /*
         Destroy(coll.gameObject.GetComponent<BoidAlignment>());
         Destroy(coll.gameObject.GetComponent<BoidCohesion>());
         Destroy(coll.gameObject.GetComponent<BoidContainerBehavior>());
@@ -244,7 +245,7 @@ public class EatingBehavior : MonoBehaviour
         //coll.gameObject.transform.SetParent(player.gameObject.transform);
 
         Destroy(coll.gameObject, time);
-
+        */
     }
 
 }
