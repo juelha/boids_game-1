@@ -231,10 +231,11 @@ public class EatingBehavior : MonoBehaviour
     {
         //Highlight boid
         Material boid = coll.gameObject.GetComponentInChildren<Renderer>().material;
-        boid.SetColor("_Color", Color.red);
+        boid.SetColor("_Color", Color.red); // TODO CHANGE COLOR TO PRETTIER RED
 
         //Destroy all movement skripts
-        Destroy(coll.gameObject);
+       // Destroy(coll.gameObject.GetComponent<BoidManager>);
+      //  Destroy(coll.gameObject);
         /*
 
         Destroy(coll.gameObject.GetComponent<BoidAlignment>());
@@ -244,11 +245,13 @@ public class EatingBehavior : MonoBehaviour
         Destroy(coll.gameObject.GetComponent<Boid>());
         */
 
+
+        // zerstöre skripte 
+
         //Set new Parent = Player
         //coll.gameObject.transform.SetParent(player.gameObject.transform);
 
-        Destroy(coll.gameObject, time);
-
+      //  Destroy(coll.gameObject, time); // wollens nach 3 sekunden zerstören
     }
 
 }

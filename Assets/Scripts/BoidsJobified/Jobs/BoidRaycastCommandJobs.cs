@@ -5,14 +5,15 @@ using Unity.Collections;
 using UnityEngine.Jobs;
 
 struct BoidRaycastCommandJobs : IJobParallelFor {
-    [ReadOnly] public ushort raycastDistance;
+    [ReadOnly] public float raycastDistance;
     [ReadOnly] public NativeArray<Vector3> velocities;
     [ReadOnly] public NativeArray<Vector3> positions;
-    //[ReadOnly] public LayerMask layerMask;
-    // public NativeArray<SpherecastCommand> Raycasts;
     public NativeArray<RaycastCommand> Raycasts;
 
     public void Execute(int i) {
+
+        raycastDistance = 0.005f;
+
         //  Raycasts[i] = new SpherecastCommand(positions[i], raycastDistance, velocities[i]);
         Raycasts[i] = new RaycastCommand(positions[i], velocities[i], raycastDistance);//, layerMask);
         Debug.DrawRay(positions[i], velocities[i] * raycastDistance, Color.yellow);  // works!!!

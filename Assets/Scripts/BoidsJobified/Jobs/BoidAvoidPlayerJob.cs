@@ -39,8 +39,11 @@ public struct BoidAvoidPlayerJob : IJobParallelForTransform {
             avoidanceVector = Vector3.Reflect(velocity[i], hitNormals[i]); // doesnt do what i want it to
                                                                            // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
 
-            avoidanceVector *= weight;
+            avoidanceVector *= weight; // short boost here?
             velocity[i] += avoidanceVector;
+
+            
+
 
         }
 

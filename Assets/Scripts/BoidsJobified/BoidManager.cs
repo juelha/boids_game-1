@@ -18,17 +18,23 @@ public class BoidManager : MonoBehaviour {
     public float avoidPlayerRadius;
 
     public int number;
+    public int initialSpawncount = 500;
+    public int spawnCount = 0;
+
     public float maxVelocity;
     public float AgentDensity;
 
     // DATA CONTAINERS
-    TransformAccessArray TransformAccessArray;
-    [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+   // TransformAccessArray TransformAccessArray;
+   // [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     NativeArray<Vector3> VelocitiesArray; // we need to be able to write to it in the jobs
 
     // RAYCAST STUFF
-    public ushort raycastDistance = 2;
-
+    public float raycastDistance = 0.5f;
+    NativeArray<RaycastCommand> raycastCommandsArray;
+    NativeArray<RaycastCommand> raycastCommandsArrayPlayer;
+    NativeArray<RaycastHit> raycastHitsArray;
+    NativeArray<RaycastHit> raycastHitsArrayPlayer;
 
     // JOBS 
     public BoidAlignmentJob AlignmentJob;
@@ -50,13 +56,28 @@ public class BoidManager : MonoBehaviour {
 
 
     void Start() {
+        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+
 
         // INIT 
         for (int i = 0; i < number; ++i) {
 
             goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
 
+
+            // init velocity
+            var obj = goList[i];  // ref to current gameobject 
+
+            VelocitiesArray[i] = obj.transform.forward * maxVelocity;
+          //  obj.transform.up = VelocitiesArray[i];
         }
+
+       
+       
+
+   
+
+        
     }
 
 
@@ -66,40 +87,65 @@ public class BoidManager : MonoBehaviour {
 
         // init arrays
         Transform[] TransformTemp = new Transform[number];
-        BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.TempJob);
-        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+
 
         // raycast data containers
         //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+        raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        raycastCommandsArrayPlayer = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+
+        NativeArray<Vector3> VelocitiesArrayPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
+        raycastHitsArrayPlayer = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
 
-        // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
-        for (int i = 0; i < number; ++i) {
+        NativeArray<Vector3> BoidsPositionArray;
+        TransformAccessArray TransformAccessArray;
+        BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
+
+        // UPDATE BOID-------------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
+
+            // limit velocity
+            if (VelocitiesArray[i].magnitude > maxVelocity) {
+                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
+            }
+
+            // use velocity to changes position
             var obj = goList[i];  // ref to current gameobject 
+            obj.transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+            obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
 
+            // save new position
             TransformTemp[i] = obj.transform;  // for TransformAccessArray
-
             BoidsPositionArray[i] = obj.transform.position;
 
-            VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
-
-            transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
             // raycast commands array init -> per boid one command 
-            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
             raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+
+
+            // PLAYER STUFF
+
+            VelocitiesArrayPlayer[i] = -VelocitiesArray[i];
+            // raycast commands array init -> per boid one command 
+            Debug.Log(BoidsPositionArray[i]);
+            Debug.Log(VelocitiesArrayPlayer[i]);
+            Debug.Log(raycastDistance);
+            raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+
+
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
-
-
+        number = TransformAccessArray.length; // update number of flock somewhere
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
+
+        /*
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
@@ -139,7 +185,7 @@ public class BoidManager : MonoBehaviour {
         SeparateJobHandle.Complete();
 
 
-
+        */
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -166,6 +212,9 @@ public class BoidManager : MonoBehaviour {
 
         handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
 
+        
+        // newVelocitiesArray.Dispose();
+
         // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
@@ -183,20 +232,22 @@ public class BoidManager : MonoBehaviour {
 
         }
 
+        // trash can raycast job
+
+        raycastCommandsArray.Dispose();
+        raycastHitsArray.Dispose();
 
         //----------------------------------------------
         BoidRaycastCommandJobs RaycastCommandJobsPlayer;
-        NativeArray<Vector3> newVelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
         for (int i = 0; i < number; i++) {
-            newVelocitiesArray[i] = -VelocitiesArray[i];
-
         }
+        float raycastDistancePlayer = 0.25f;
 
         RaycastCommandJobsPlayer = new BoidRaycastCommandJobs() {
-            raycastDistance = raycastDistance,
+            raycastDistance = raycastDistancePlayer,
             positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
-            velocities = newVelocitiesArray,
-            Raycasts = raycastCommandsArray,
+            velocities = VelocitiesArrayPlayer,
+            Raycasts = raycastCommandsArrayPlayer,
         };
 
         // Schedule the batch of raycasts
@@ -207,16 +258,17 @@ public class BoidManager : MonoBehaviour {
         handlePlayer.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
 
 
+        
 
-        // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------
+        // IS BOID ABOUT TO HIT PLAYER?--------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
             RaycastHit hit;
-            hit = raycastHitsArray[i];
+            hit = raycastHitsArrayPlayer[i];
 
             // about to hit Player?
             if (hit.collider) {
-                //  if (hit.collider.gameObject.tag == "Shark") {
+       // if (hit.collider.gameObject.tag == "shark") {
                 isHitPlayer[i] = true;
                 hitNormalsPlayer[i] = hit.normal;
             }
@@ -226,12 +278,13 @@ public class BoidManager : MonoBehaviour {
 
         }
 
-        // trash can
-        raycastCommandsArray.Dispose();
-        raycastHitsArray.Dispose();
-        newVelocitiesArray.Dispose();
-
+        // trash can  raycast job
+        raycastCommandsArrayPlayer.Dispose();
+        VelocitiesArrayPlayer.Dispose();
+        raycastHitsArrayPlayer.Dispose();
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        /*
         AvoidPlayerJob = new BoidAvoidPlayerJob() {
 
             radius = avoidPlayerRadius,
@@ -243,13 +296,14 @@ public class BoidManager : MonoBehaviour {
         AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, handle);
         AvoidPlayerJobHandle.Complete();
 
+        */
 
         AvoidObjJob = new BoidAvoidObjJob() {
             isHitObstacles = isHitObj,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
         };
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handle);
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handle);//, AvoidPlayerJobHandle);
         AvoidObjJobHandle.Complete();
 
 
@@ -259,24 +313,52 @@ public class BoidManager : MonoBehaviour {
         isHitObj.Dispose();
         isHitPlayer.Dispose();
 
+        
 
-        // UPDATE BOID-------------------------------------------------------------------------
-        for (int i = 0; i < number; i++) {
-            if (VelocitiesArray[i].magnitude > maxVelocity) {
-                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
-            }
-            TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
-            TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
-        }
+        // problem we delete and do not save changed vel anywhere!!!!
+        // trash can
+        // BoidsPositionArray.Dispose();
+        //  VelocitiesArray.Dispose();
+        //  TransformAccessArray.Dispose();
+
+
 
         // trash can
-        BoidsPositionArray.Dispose();
-        VelocitiesArray.Dispose();
         TransformAccessArray.Dispose();
+        BoidsPositionArray.Dispose();
 
+        
     }
 
 
+    
+    private void OnDestroy() {
+  //  private void OnDisable() {
 
+      //  BoidsPositionArray.Dispose();
+        VelocitiesArray.Dispose();
+      //  raycastCommandsArray.Dispose();
+      //  raycastHitsArray.Dispose();
+        //  TransformAccessArray.Dispose();
+    }
+
+    
+
+
+
+    /*
+    public void Spanwer(int amt) {
+        spawnCount += amt;
+        //VelocitiesArray = new NativeArray<float>(spawnCount, Allocator.Persistent);
+        for (int i = 0; i < amt; i++) {
+            Vector3 pos = this.transform.position;// + new Vector3(UnityEngine.Random.Range(-swimLimits.x, swimLimits.x), UnityEngine.Random.Range(-swimLimits.y, swimLimits.y), UnityEngine.Random.Range(-swimLimits.z, swimLimits.z));
+
+            fishesTrs.Add(Instantiate(fishPrefab, pos, Quaternion.identity, flockParent ? flockParent : null).transform);
+            float speed = UnityEngine.Random.Range(minSpeed, maxSpeed);
+            fishSpeeds[i] = speed;
+        }
+        fishTrsAccessArray = new TransformAccessArray(fishesTrs.ToArray());
+    }
+    */
 
 }
