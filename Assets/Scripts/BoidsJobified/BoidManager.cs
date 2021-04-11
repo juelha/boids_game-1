@@ -70,8 +70,8 @@ public class BoidManager : MonoBehaviour {
 
             VelocitiesArray[i] = obj.transform.forward * maxVelocity;
             //  obj.transform.up = VelocitiesArray[i];
-            Debug.Log("VEL");
-            Debug.Log(VelocitiesArray[i]);
+          //  Debug.Log("VEL");
+         //   Debug.Log(VelocitiesArray[i]);
         }
 
        
@@ -135,20 +135,17 @@ public class BoidManager : MonoBehaviour {
 
             // update vel since we changed stuff
            // VelocitiesArray[i] = obj.transform.position;// * maxVelocity;
-            VelocitiesArray[i] = obj.transform.forward * maxVelocity;// * maxVelocity;
+           // VelocitiesArray[i] = obj.transform.forward * maxVelocity;// * maxVelocity;
 
-            // raycast commands array init -> per boid one command 
-            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+            
 
 
             // PLAYER STUFF
-
-            VelocitiesArrayPlayer[i] = -VelocitiesArray[i];
             // raycast commands array init -> per boid one command 
           //  Debug.Log(BoidsPositionArray[i]);
           //  Debug.Log(VelocitiesArrayPlayer[i]);
           //  Debug.Log(raycastDistance);
-            raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+         //   raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
 
 
         }
@@ -160,7 +157,7 @@ public class BoidManager : MonoBehaviour {
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
-        /*
+        
         
         AlignmentJob = new BoidAlignmentJob() {
             BoidsPositionArray = BoidsPositionArray,
@@ -200,7 +197,7 @@ public class BoidManager : MonoBehaviour {
         CohesionJobHandle.Complete();
         SeparateJobHandle.Complete();
 
-        */
+        
         
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -213,6 +210,11 @@ public class BoidManager : MonoBehaviour {
 
         // make job
         BoidRaycastCommandJobs RaycastCommandJobs;
+        for (int i = 0; i < number; i++) {
+            // raycast commands array init -> per boid one command 
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+
+        }
 
         RaycastCommandJobs = new BoidRaycastCommandJobs() {
             raycastDistance = raycastDistance,
@@ -236,10 +238,10 @@ public class BoidManager : MonoBehaviour {
             // the collider that was hit 
             RaycastHit hit;
             hit = raycastHitsArray[i];
-            isHitObj[i] = raycastHitsArray[i].collider ? true : false;
-            hitNormals[i] = raycastHitsArray[i].normal;
+          //  isHitObj[i] = raycastHitsArray[i].collider ? true : false;
+           // hitNormals[i] = raycastHitsArray[i].normal;
 
-            /*
+            
             // about to hit Obj?
             if (hit.collider) {
                 Debug.Log("HIT");
@@ -248,7 +250,7 @@ public class BoidManager : MonoBehaviour {
             }
             else {
                 isHitObj[i] = false;
-            }*/
+            }
 
         }
 
@@ -259,7 +261,15 @@ public class BoidManager : MonoBehaviour {
 
         //----------------------------------------------
         BoidRaycastCommandJobs RaycastCommandJobsPlayer;
+
+
         for (int i = 0; i < number; i++) {
+            // raycast commands array init -> per boid one command 
+           
+
+
+            VelocitiesArrayPlayer[i] = -VelocitiesArray[i];
+            raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArrayPlayer[i], raycastDistance);
         }
         float raycastDistancePlayer = 0.25f;
 
