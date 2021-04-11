@@ -29,6 +29,8 @@ public class EatingBehavior : MonoBehaviour
     public float decreaseSize = 0.0001f;
     public float destroyBoidAfter = 2f;
 
+    private float normalSpeed;
+
     //sounds
     public AudioClip eat1;
     public AudioClip eat2;
@@ -36,7 +38,8 @@ public class EatingBehavior : MonoBehaviour
     public AudioClip eat4;
     private AudioSource eatingSound;
 
-
+    //animation
+    public Animator anim;
 
 
     //Immer nur einen auf einmal
@@ -44,7 +47,7 @@ public class EatingBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        normalSpeed = player.speed;
         //Aktuel Score for Highscore List:
         PlayerPrefs.SetInt("ActScore", 0);
         this.score = 0;
@@ -146,7 +149,15 @@ public class EatingBehavior : MonoBehaviour
 
     private void DisplaySpeedUI()
     {
-        this.speed.text = player.speed.ToString("F2");
+        if(normalSpeed > 0)
+        {
+            this.speed.text = "Speed  X" + (player.speed / normalSpeed).ToString("");
+        }
+        else
+        {
+            //If speed is 0
+            this.speed.text = "";
+        }
     }
 
     private void PlayEatingSound()
@@ -198,15 +209,26 @@ public class EatingBehavior : MonoBehaviour
     // player.slowDown();
     //}
     //}
-    private void OnTriggerEnter(Collider col)
-    //private void OnTriggerEnter(Collider col)
+
+    IEnumerator AttackAnimation(float time)
     {
-        Debug.Log("collision");
-        Debug.Log(col.gameObject.tag);
-        Debug.Log(col.gameObject);
-        //Debug.Log("Tag Collider" + gameObject.tag);
+        //change animation
+        anim.SetBool("Attack", true);
+        
+
+        yield return new WaitForSeconds(time);
+        anim.SetBool("Attack", false);
+        
+    }
+
+    private void OnTriggerEnter(Collider col)
+    { 
+
         if (col.gameObject.tag == "Boid") // || col.gameObject.tag == "wall2" || col.gameObject.tag == "wall3" || col.gameObject.tag == "wall4" )
         {
+            //animation shark
+            
+            StartCoroutine(AttackAnimation(1f));
             //Increase shark, when he eats fish, but with maximum size
             if (scaling)
             {

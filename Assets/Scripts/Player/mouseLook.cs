@@ -6,6 +6,7 @@ public class mouseLook : MonoBehaviour
 {
     public Camera cam1;
     public Camera cam2;
+    public Camera cam3;
 
     public float mouseSensitivity = 200f;
     public Transform playerBody;
@@ -17,6 +18,7 @@ public class mouseLook : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         cam1.enabled = true;
         cam2.enabled = false;
+        cam3.enabled = false;
     }
 
     // Update is called once per frame
@@ -30,8 +32,22 @@ public class mouseLook : MonoBehaviour
         //Camera Change
         if (Input.GetKeyDown(KeyCode.F))
         {
-            cam1.enabled = !cam1.enabled;
-            cam2.enabled = !cam2.enabled;
+            cam1.enabled = false;
+            cam2.enabled = true;
+            cam3.enabled = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            cam1.enabled = false;
+            cam2.enabled = false;
+            cam3.enabled = true;
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            cam1.enabled = true;
+            cam2.enabled = false;
+            cam3.enabled = false;
         }
 
 
