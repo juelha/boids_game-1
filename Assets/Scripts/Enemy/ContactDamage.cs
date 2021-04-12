@@ -7,6 +7,12 @@ public class ContactDamage : MonoBehaviour
     private float timeSinceLastHit = 0f;
     public HealthSystem healthSystem;
 
+    private AudioSource hitSound;
+
+    private void Start()
+    {
+        hitSound = this.GetComponent<AudioSource>();
+    }
     private void Update()
     {
         if(timeSinceLastHit < 5f)
@@ -22,6 +28,7 @@ public class ContactDamage : MonoBehaviour
         //Just if collision with body and prevent 2 hits at same time
         if (col.gameObject.tag == "shark" && col.collider.gameObject.tag == "body" && timeSinceLastHit > 2f) 
         {
+            hitSound.Play();
             Debug.Log(col.collider.gameObject.tag);
             
             timeSinceLastHit = 0f;
