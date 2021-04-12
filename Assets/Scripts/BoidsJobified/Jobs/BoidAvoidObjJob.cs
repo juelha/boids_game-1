@@ -54,7 +54,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
             //  avoidanceVector *= weight;
-            velocity[i] = velocity[i] * (-1);
+            velocity[i] = velocity[i] * (-7);
 
             //t = 20;
             velocity[i] += reflectedVector;
@@ -69,7 +69,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //  avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
 
 
-          //  dir = reflectedVector;
+           // dir = reflectedVector;
         }
         if (velocity[i].magnitude > 5) {
             velocity[i] = velocity[i].normalized * 5;
@@ -84,7 +84,8 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
         transform.position += velocity[i] * t;
         posNew = transform.position;
-        transform.rotation = Quaternion.Slerp(trsOld, Quaternion.FromToRotation(posOld, posNew), rotationSpeed * t);
+        transform.rotation =  Quaternion.FromToRotation(posOld, posNew );
+    //    transform.rotation = Quaternion.Slerp(trsOld, Quaternion.FromToRotation(posOld, posNew), rotationSpeed * t);
 
         // transform.rotation = Quaternion.FromToRotation(transform.position, dir);
         /*
