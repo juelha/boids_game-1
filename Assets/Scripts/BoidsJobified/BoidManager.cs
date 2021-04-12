@@ -69,10 +69,6 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.TempJob);
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
-        // raycast data containers
-        //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
 
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,20 +76,17 @@ public class BoidManager : MonoBehaviour {
 
             var obj = goList[i];  // ref to current gameobject 
 
-          //  var obj = goList[i];  // ref to current gameobject 
 
-            //    obj.transform.position = VelocitiesArray[i];
+          //     obj.transform.position = VelocitiesArray[i];
             TransformTemp[i] = obj.transform;  // for TransformAccessArray
 
             BoidsPositionArray[i] = obj.transform.position;
 
-            VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
+            VelocitiesArray[i] = obj.transform.up * maxVelocity; // change start velocity HERE
 
-          //  transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+         //   obj.transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
-            // raycast commands array init -> per boid one command 
-            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
-            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+            
         }
 
         TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
@@ -152,8 +145,24 @@ public class BoidManager : MonoBehaviour {
         NativeArray<Vector3> hitNormals = new NativeArray<Vector3>(number, Allocator.TempJob);
         NativeArray<Vector3> hitNormalsPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
 
+
+        // raycast data containers
+        //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastCommand> raycastCommandsArrayPlayer = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+        NativeArray<RaycastHit> raycastHitsArrayPlayer = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+
         // make job
         BoidRaycastCommandJobs RaycastCommandJobs;
+
+
+        for (int i = 0; i < number; i++) {
+            // raycast commands array init -> per boid one command 
+            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+
+        }
 
         RaycastCommandJobs = new BoidRaycastCommandJobs() {
             raycastDistance = raycastDistance,
@@ -190,8 +199,13 @@ public class BoidManager : MonoBehaviour {
         //----------------------------------------------
         BoidRaycastCommandJobs RaycastCommandJobsPlayer;
         NativeArray<Vector3> newVelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+
+
         for (int i = 0; i < number; i++) {
             newVelocitiesArray[i] = -VelocitiesArray[i];
+            // raycast commands array init -> per boid one command 
+            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
+            raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], newVelocitiesArray[i], raycastDistance);
 
         }
 
@@ -199,13 +213,13 @@ public class BoidManager : MonoBehaviour {
             raycastDistance = raycastDistance,
             positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
             velocities = newVelocitiesArray,
-            Raycasts = raycastCommandsArray,
+            Raycasts = raycastCommandsArrayPlayer,
         };
 
         // Schedule the batch of raycasts
         JobHandle handlePlayer;
         var setupDependencyPlayer = RaycastCommandJobsPlayer.Schedule(number, 32, handle);
-        handlePlayer = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependencyPlayer);
+        handlePlayer = RaycastCommand.ScheduleBatch(raycastCommandsArrayPlayer, raycastHitsArrayPlayer, 32, setupDependencyPlayer);
 
         handlePlayer.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
 
@@ -215,11 +229,11 @@ public class BoidManager : MonoBehaviour {
         for (int i = 0; i < number; i++) {
             // the collider that was hit 
             RaycastHit hit;
-            hit = raycastHitsArray[i];
+            hit = raycastHitsArrayPlayer[i];
 
             // about to hit Player?
-            if (hit.collider) {
-                //  if (hit.collider.gameObject.tag == "Shark") {
+           // if (hit.collider) {
+            if (1==2){//hit.collider.gameObject.tag == "shark") {
                 isHitPlayer[i] = true;
                 hitNormalsPlayer[i] = hit.normal;
             }
@@ -231,7 +245,9 @@ public class BoidManager : MonoBehaviour {
 
         // trash can
         raycastCommandsArray.Dispose();
+        raycastCommandsArrayPlayer.Dispose();
         raycastHitsArray.Dispose();
+        raycastHitsArrayPlayer.Dispose();
         newVelocitiesArray.Dispose();
 
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -273,12 +289,10 @@ public class BoidManager : MonoBehaviour {
 
             var obj = goList[i];  // ref to current gameobject 
             obj.transform.up += VelocitiesArray[i]; // for TransformAccessArray
+           // obj.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(VelocitiesArray[i]), Time.deltaTime);
             obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
 
             goList[i] = obj; 
-          //  TransformAccessArray[i].up = VelocitiesArray[i]; // cannot turn this into a job bc transform.up
-          //  TransformAccessArray[i].position += VelocitiesArray[i] * Time.deltaTime;
-
 
         }
 
