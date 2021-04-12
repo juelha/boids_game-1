@@ -71,6 +71,9 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
            // dir = reflectedVector;
         }
+
+        /*
+
         if (velocity[i].magnitude > 5) {
             velocity[i] = velocity[i].normalized * 5;
         }
@@ -80,12 +83,14 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
         posOld = transform.position;
         trsOld = transform.rotation;
-      //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
+        //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
 
         transform.position += velocity[i] * t;
         posNew = transform.position;
-        transform.rotation =  Quaternion.FromToRotation(posOld, posNew );
-    //    transform.rotation = Quaternion.Slerp(trsOld, Quaternion.FromToRotation(posOld, posNew), rotationSpeed * t);
+        transform.rotation = Quaternion.FromToRotation(posOld, posNew);
+        */
+
+        //    transform.rotation = Quaternion.Slerp(trsOld, Quaternion.FromToRotation(posOld, posNew), rotationSpeed * t);
 
         // transform.rotation = Quaternion.FromToRotation(transform.position, dir);
         /*

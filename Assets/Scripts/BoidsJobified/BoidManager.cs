@@ -55,7 +55,6 @@ public class BoidManager : MonoBehaviour {
     void Start() {
 
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
-          Transform[] TransformTemp = new Transform[number];
         // INIT 
         for (int i = 0; i < number; ++i) {
 
@@ -74,10 +73,8 @@ public class BoidManager : MonoBehaviour {
             //  VelocitiesArray[i] = BoidsTrs[i].forward * maxVelocity;
             // BoidsTrs[i].up = VelocitiesArray[i];
 
-            TransformTemp[i] =  goList[i].transform;  // for TransformAccessArray BoidsTrs[i];//
 
         }
-        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
        // TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
         VelocitiesArray.Dispose();
     }
@@ -93,6 +90,7 @@ public class BoidManager : MonoBehaviour {
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
 
+        Transform[] TransformTemp = new Transform[number];
 
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
         for (int i = 0; i < number; ++i) {
@@ -100,6 +98,7 @@ public class BoidManager : MonoBehaviour {
             //   var obj = goList[i];  // ref to current gameobject 
 
 
+            TransformTemp[i] = goList[i].transform;  // for TransformAccessArray BoidsTrs[i];//
             //     obj.transform.position = VelocitiesArray[i];
             // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
 
@@ -115,13 +114,14 @@ public class BoidManager : MonoBehaviour {
         //  TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
 
+        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
-  //          /*
-    AlignmentJob = new BoidAlignmentJob() {
+        //          /*
+        AlignmentJob = new BoidAlignmentJob() {
         BoidsPositionArray = BoidsPositionArray,
         velocity = VelocitiesArray,
     };
@@ -311,6 +311,24 @@ public class BoidManager : MonoBehaviour {
         for (int i = 0; i < number; i++) {
 
 
+            if (VelocitiesArray[i].magnitude > 5) {
+                VelocitiesArray[i] = VelocitiesArray[i].normalized * 5;
+            }
+            // dir = velocity[i];
+            //transform.rotation = Quaternion.
+            //  
+
+            var posOld = Vector3.zero;
+            var posNew = Vector3.zero;
+            var trsOld = Quaternion.identity;
+            posOld = goList[i].transform.position;
+            trsOld = goList[i].transform.rotation;
+            //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
+
+            goList[i].transform.up = VelocitiesArray[i];
+            goList[i].transform.position += VelocitiesArray[i] * t;
+            posNew = goList[i].transform.position;
+           // goList[i].transform.rotation = Quaternion.FromToRotation(posOld, posNew);
             /*
             var obj = goList[i];  // ref to current gameobject 
             obj.transform.up = VelocitiesArray[i]; // for TransformAccessArray
@@ -326,11 +344,11 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
 
+        TransformAccessArray.Dispose();
     }
 
     public void OnDestroy() {
 
-        TransformAccessArray.Dispose();
     }
 
 
