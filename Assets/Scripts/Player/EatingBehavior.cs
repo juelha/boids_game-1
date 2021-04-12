@@ -76,11 +76,11 @@ public class EatingBehavior : MonoBehaviour
         {
             GameState.Transition(GameState.Event.TogglePause);
         }
-
+        */
         if (this.IsGameOver())
         {
             GameState.Transition(GameState.Event.FinishGame);
-        }*/
+        }
     }
 
     private void UpdateGameTime()
@@ -214,7 +214,7 @@ public class EatingBehavior : MonoBehaviour
             }
 
             PlayEatingSound();
-            AddScore(5);
+            AddScore(10);
             //Destroy
             DestroyBoidAfter(destroyBoidAfter, col);
 
@@ -231,7 +231,7 @@ public class EatingBehavior : MonoBehaviour
             }
 
             PlayEatingSound();
-            AddScore(20);
+            AddScore(50);
             //Destroy
             DestroyBoidAfter(destroyBoidAfter, col);
         }
@@ -247,7 +247,7 @@ public class EatingBehavior : MonoBehaviour
         
             gametime += 10f;
             PlayEatingSound();
-            AddScore(10);
+            AddScore(15);
             //Destroy
             DestroyBoidAfter(destroyBoidAfter, col);
         }
