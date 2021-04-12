@@ -89,16 +89,27 @@ public class BoidManager : MonoBehaviour {
               //  Random.insideUnitSphere * number * AgentDensity,
               pos,
                 //setting a random rotation
-                Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f)),
-                transform));
+                Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f))
+                )
+                );//; ;// ;transform));
 
 
-            VelocitiesArray[i] = goList[i].transform.forward * maxVelocity;
-            goList[i].transform.up += VelocitiesArray[i];
+          //  VelocitiesArray[i] = goList[i].transform.forward * maxVelocity;
+           // goList[i].transform.up = VelocitiesArray[i];
+           
             //     BoidsTrs[i] = goList[i].transform;
 
 
-            TransformTemp[i] = goList[i].transform;
+            var obj = goList[i];
+
+
+            TransformTemp[i] = obj.transform;
+
+            VelocitiesArray[i] = obj.transform.forward * maxVelocity;
+            obj.transform.up = VelocitiesArray[i];
+
+
+            goList[i] = obj;
 
         }
         // TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
@@ -122,16 +133,18 @@ public class BoidManager : MonoBehaviour {
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
         for (int i = 0; i < number; ++i) {
 
-            //   var obj = goList[i];  // ref to current gameobject 
+               var obj = goList[i];  // ref to current gameobject 
 
             // BoidsPositionArray[i] = BoidsTrs[i].position;
             // VelocitiesArray[i] = BoidsTrs[i].forward;// - BoidsTrs[i].position;
 
 
-            BoidsPositionArray[i] = goList[i].transform.position;
-            VelocitiesArray[i] = goList[i].transform.forward;// - BoidsTrs[i].position;
+         //  BoidsPositionArray[i] = goList[i].transform.position;
+         //   VelocitiesArray[i] = goList[i].transform.forward;// - BoidsTrs[i].position;
 
 
+            BoidsPositionArray[i] = obj.transform.position;
+            VelocitiesArray[i] = obj.transform.forward;// - BoidsTrs[i].position;
 
             // for TransformAccessArray BoidsTrs[i];//
             //     obj.transform.position = VelocitiesArray[i];
@@ -374,15 +387,25 @@ public class BoidManager : MonoBehaviour {
             var posNew = Vector3.zero;
             var trsOld = Quaternion.identity;
             var rotOld = Quaternion.identity;
-            posOld = goList[i].transform.position;
-            rotOld = goList[i].transform.rotation;
+            // posOld = goList[i].transform.position;
+            //  rotOld = goList[i].transform.rotation;
+
+            var obj = goList[i];
+            posOld = obj.transform.position;
+            rotOld = obj.transform.rotation;
+
             //  trsOld = BoidsTrs[i].rotation;
             var dir = Vector3.zero;
             //  dir = VelocitiesArray[i];
             dir = VelocitiesArray[i];// + posOld;
-            goList[i].transform.rotation = Quaternion.Slerp(rotOld, Quaternion.FromToRotation(posOld, dir), t);
-            goList[i].transform.position += goList[i].transform.forward * t;
+            obj.transform.up = VelocitiesArray[i];  // goList[i].transform.rotation 
+            obj.transform.rotation = Quaternion.Slerp(rotOld, Quaternion.FromToRotation(posOld, dir), t);
+            obj.transform.position += obj.transform.forward * t;
 
+
+             goList[i] = obj;
+
+            //   goList[i].transform.up = VelocitiesArray[i]; // posOld +
             // BoidsTrs[i].rotation = Quaternion.FromToRotation(posOld, posOld+VelocitiesArray[i]);
             //  BoidsTrs[i].up += posOld+ VelocitiesArray[i];
             //  BoidsTrs[i].up = VelocitiesArray[i];  // cannot jobify .up
