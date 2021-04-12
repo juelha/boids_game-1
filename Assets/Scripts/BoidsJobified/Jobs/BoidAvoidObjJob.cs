@@ -54,11 +54,17 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
             //  avoidanceVector *= weight;
+
+            // spitzer angle
+            
             velocity[i] = velocity[i] * (-7);
+            velocity[i] += reflectedVector;
 
             //t = 20;
-            velocity[i] += reflectedVector;
-           // velocity[i] *= 20;
+            // reflecter als ergebnis
+            //  velocity[i] = velocity[i] * (7);
+            // velocity[i] += hitNormals[i];// reflectedVector;
+            // velocity[i] *= 20;
             // velocity[i] = test;
 
 
@@ -69,7 +75,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //  avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
 
 
-           // dir = reflectedVector;
+            // dir = reflectedVector;
         }
 
         /*

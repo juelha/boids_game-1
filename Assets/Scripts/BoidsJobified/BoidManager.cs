@@ -37,6 +37,7 @@ public class BoidManager : MonoBehaviour {
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
     public BoidSeparateJob SeparateJob;
+    public BoidStayJob StayJob;
 
     public BoidAvoidPlayerJob AvoidPlayerJob;
     public BoidAvoidObjJob AvoidObjJob;
@@ -46,6 +47,7 @@ public class BoidManager : MonoBehaviour {
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
     JobHandle SeparateJobHandle;
+    JobHandle StayJobHandle;
 
     JobHandle AvoidPlayerJobHandle;
     JobHandle AvoidObjJobHandle;
@@ -124,43 +126,48 @@ public class BoidManager : MonoBehaviour {
         AlignmentJob = new BoidAlignmentJob() {
         BoidsPositionArray = BoidsPositionArray,
         velocity = VelocitiesArray,
-    };
+        };
 
-    CohesionJob = new BoidCohesionJob() {
-        BoidsPositionArray = BoidsPositionArray,
-        velocity = VelocitiesArray,
-    };
+        CohesionJob = new BoidCohesionJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
 
-    SeparateJob = new BoidSeparateJob() {
-        BoidsPositionArray = BoidsPositionArray,
-        velocity = VelocitiesArray,
-    };
+        SeparateJob = new BoidSeparateJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
 
-
-
-
-    // Schedule--------------------------------------------------------
-    AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
-    CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);
-    SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        StayJob = new BoidStayJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
 
 
+        // Schedule--------------------------------------------------------
+        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
+        CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);
+        SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        StayJobHandle = StayJob.Schedule(TransformAccessArray, SeparateJobHandle);
 
 
-    // update gets called in the end and uses the changed velocities to move obj with transform
-    // combine all dependencies: 
-    //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
-
-    // Populate `handles` with `JobHandles` from multiple scheduled jobs...
 
 
-    // Complete--------------------------------------------------------
-    AlignmentJobHandle.Complete();
-    CohesionJobHandle.Complete();
-    SeparateJobHandle.Complete();
+        // update gets called in the end and uses the changed velocities to move obj with transform
+        // combine all dependencies: 
+        //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
+
+        // Populate `handles` with `JobHandles` from multiple scheduled jobs...
 
 
-   // */
+        // Complete--------------------------------------------------------
+        AlignmentJobHandle.Complete();
+        CohesionJobHandle.Complete();
+        SeparateJobHandle.Complete();
+        StayJobHandle.Complete();
+
+
+        // */
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -325,7 +332,7 @@ public class BoidManager : MonoBehaviour {
             trsOld = goList[i].transform.rotation;
             //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
 
-            goList[i].transform.up = VelocitiesArray[i];
+            goList[i].transform.up = VelocitiesArray[i];  // cannot jobify .up
             goList[i].transform.position += VelocitiesArray[i] * t;
             posNew = goList[i].transform.position;
            // goList[i].transform.rotation = Quaternion.FromToRotation(posOld, posNew);
