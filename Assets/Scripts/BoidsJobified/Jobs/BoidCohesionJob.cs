@@ -13,7 +13,7 @@ public struct BoidCohesionJob : IJobParallelForTransform {
 
         // in case of disaster change these:
         int radius = 10;
-        int weight = 1;
+        float weight = 0.05f;
 
         var average_cohesion = Vector3.zero;
         var found = 0;

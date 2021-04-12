@@ -12,12 +12,15 @@ public class BoidManager : MonoBehaviour {
     public List<GameObject> goList;
     public GameObject prefab;
 
+    private List<Transform> BoidsTrs = new List<Transform>();
+
     // STUFF TO CHANGE IN EDITOR  
     public float StartRadius;
 
     public float avoidPlayerRadius;
 
     public int number;
+    public float t;
     public float maxVelocity;
     public float AgentDensity;
 
@@ -54,9 +57,12 @@ public class BoidManager : MonoBehaviour {
         // INIT 
         for (int i = 0; i < number; ++i) {
 
-            goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
-
+          //  goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
+            Vector3 pos = this.transform.position+ Random.insideUnitSphere * StartRadius * AgentDensity;
+          //  BoidsTrs.Add(Instantiate(prefab, pos, Random.rotation).transform);
+           BoidsTrs.Add(Instantiate(prefab, pos, Quaternion.identity).transform);
         }
+       
     }
 
 
@@ -65,7 +71,7 @@ public class BoidManager : MonoBehaviour {
         // DATA CONTAINERS
 
         // init arrays
-        Transform[] TransformTemp = new Transform[number];
+    //    Transform[] TransformTemp = new Transform[number];
         BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.TempJob);
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
@@ -74,68 +80,71 @@ public class BoidManager : MonoBehaviour {
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
         for (int i = 0; i < number; ++i) {
 
-            var obj = goList[i];  // ref to current gameobject 
+         //   var obj = goList[i];  // ref to current gameobject 
 
 
           //     obj.transform.position = VelocitiesArray[i];
-            TransformTemp[i] = obj.transform;  // for TransformAccessArray
+           // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
 
-            BoidsPositionArray[i] = obj.transform.position;
+            BoidsPositionArray[i] = BoidsTrs[i].position;
 
-            VelocitiesArray[i] = obj.transform.up * maxVelocity; // change start velocity HERE
+            VelocitiesArray[i] = BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
 
-         //   obj.transform.up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
-            
+         //   BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+
         }
+        TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
 
-        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        //  TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
 
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
-        AlignmentJob = new BoidAlignmentJob() {
-            BoidsPositionArray = BoidsPositionArray,
-            velocity = VelocitiesArray,
-        };
 
-        CohesionJob = new BoidCohesionJob() {
-            BoidsPositionArray = BoidsPositionArray,
-            velocity = VelocitiesArray,
-        };
+  //          /*
+    AlignmentJob = new BoidAlignmentJob() {
+        BoidsPositionArray = BoidsPositionArray,
+        velocity = VelocitiesArray,
+    };
 
-        SeparateJob = new BoidSeparateJob() {
-            BoidsPositionArray = BoidsPositionArray,
-            velocity = VelocitiesArray,
-        };
+    CohesionJob = new BoidCohesionJob() {
+        BoidsPositionArray = BoidsPositionArray,
+        velocity = VelocitiesArray,
+    };
 
-
-
-
-        // Schedule--------------------------------------------------------
-        AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
-        CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);
-        SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
+    SeparateJob = new BoidSeparateJob() {
+        BoidsPositionArray = BoidsPositionArray,
+        velocity = VelocitiesArray,
+    };
 
 
 
 
-        // update gets called in the end and uses the changed velocities to move obj with transform
-        // combine all dependencies: 
-        //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
-
-        // Populate `handles` with `JobHandles` from multiple scheduled jobs...
-
-
-        // Complete--------------------------------------------------------
-        AlignmentJobHandle.Complete();
-        CohesionJobHandle.Complete();
-        SeparateJobHandle.Complete();
+    // Schedule--------------------------------------------------------
+    AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
+    CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);
+    SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
 
 
 
+
+    // update gets called in the end and uses the changed velocities to move obj with transform
+    // combine all dependencies: 
+    //  NativeArray<JobHandle> handles = new NativeArray<JobHandle>(1, Allocator.TempJob);
+
+    // Populate `handles` with `JobHandles` from multiple scheduled jobs...
+
+
+    // Complete--------------------------------------------------------
+    AlignmentJobHandle.Complete();
+    CohesionJobHandle.Complete();
+    SeparateJobHandle.Complete();
+
+
+   // */
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -251,13 +260,14 @@ public class BoidManager : MonoBehaviour {
         newVelocitiesArray.Dispose();
 
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
-
+        t = Time.deltaTime;
         AvoidObjJob = new BoidAvoidObjJob() {
             isHitObstacles = isHitObj,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
+            t = t,
         };
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray, handlePlayer);
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray);
         AvoidObjJobHandle.Complete();
 
 
@@ -283,17 +293,17 @@ public class BoidManager : MonoBehaviour {
 
         // UPDATE BOID-------------------------------------------------------------------------
         for (int i = 0; i < number; i++) {
-            if (VelocitiesArray[i].magnitude > maxVelocity) {
-                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
-            }
 
+
+            /*
             var obj = goList[i];  // ref to current gameobject 
-            obj.transform.up += VelocitiesArray[i]; // for TransformAccessArray
-           // obj.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(VelocitiesArray[i]), Time.deltaTime);
+            obj.transform.up = VelocitiesArray[i]; // for TransformAccessArray
+                                                   // obj.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(VelocitiesArray[i]), Time.deltaTime);
             obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
-
+            
+        BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
             goList[i] = obj; 
-
+            */
         }
 
         // trash can

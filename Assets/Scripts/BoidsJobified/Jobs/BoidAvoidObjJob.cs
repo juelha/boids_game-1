@@ -9,6 +9,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
     [ReadOnly] public NativeArray<Vector3> hitNormals;
+    public float t;
 
 
     public void Execute(int i, TransformAccess transform) {
@@ -20,11 +21,12 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
     //    Vector3[] oppositeVel;
 
          var reflectedVector = Vector3.zero;
-           var oppositeVel = Vector3.zero;
+           var dir = Vector3.zero;
         var avoidanceVector = Vector3.zero;
         var found = 0;
         var rotationSpeed = 2;
 
+       
      //   Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
         // at this point we know if boid is about to hit sth 
@@ -45,14 +47,14 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
                                                                            // transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
 
 
-            //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * deltaTime);
+            // 
             //  Debug.Log("avoidanceVector");
             //   Debug.Log(avoidanceVector);
             //avoidanceVector = hitNormals[i];
             //  avoidanceVector *= weight;
-            velocity[i] = velocity[i] * (-1); 
+            velocity[i] = velocity[i] * (-1);
 
-
+            //t = 20;
             velocity[i] += reflectedVector;
             velocity[i] *= 20;
             // velocity[i] = test;
@@ -65,11 +67,16 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //  avoidanceMove += (Vector3)(agent.transform.position - closestPointofObstacle);
 
 
-
+          //  dir = reflectedVector;
         }
-
-
-
+        if (velocity[i].magnitude > 5) {
+            velocity[i] = velocity[i].normalized * 5;
+        }
+        dir = velocity[i];
+      //  transform.rotation = Quaternion.LookRotation(transform.position, dir);
+        transform.rotation = Quaternion.FromToRotation(transform.position, dir);
+        //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * t);
+        transform.position += velocity[i]*t;
         /*
         if (found > 0) {
             avoidanceVector /= found;  // normalizing

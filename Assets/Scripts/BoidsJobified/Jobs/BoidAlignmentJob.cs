@@ -14,7 +14,7 @@ public struct BoidAlignmentJob : IJobParallelForTransform {
 
         // in case of disaster change these:
         int radius = 10;
-        int weight = 3;
+        float weight = 0.05f;
 
         var average_alignment = Vector3.zero;
         var found = 0;
