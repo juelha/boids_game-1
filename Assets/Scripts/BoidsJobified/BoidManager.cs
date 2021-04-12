@@ -25,7 +25,7 @@ public class BoidManager : MonoBehaviour {
     public float AgentDensity;
 
     // DATA CONTAINERS
-    TransformAccessArray TransformAccessArray;
+    public TransformAccessArray TransformAccessArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
     NativeArray<Vector3> VelocitiesArray; // we need to be able to write to it in the jobs
 
@@ -54,15 +54,32 @@ public class BoidManager : MonoBehaviour {
 
     void Start() {
 
+        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+          Transform[] TransformTemp = new Transform[number];
         // INIT 
         for (int i = 0; i < number; ++i) {
 
-          //  goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
+           goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
             Vector3 pos = this.transform.position+ Random.insideUnitSphere * StartRadius * AgentDensity;
-          //  BoidsTrs.Add(Instantiate(prefab, pos, Random.rotation).transform);
-           BoidsTrs.Add(Instantiate(prefab, pos, Quaternion.identity).transform);
+            //  BoidsTrs.Add(Instantiate(prefab, pos, Random.rotation).transform);
+           Quaternion rot = Random.rotation;
+            // Quaternion rot = Quaternion.identity;
+            // Quaternion rot = Quaternion.FromToRotation(this.transform.position, this.transform.forward);
+
+           // Quaternion rot = Quaternion.Slerp(this.transform.rotation, Quaternion.FromToRotation(this.transform.position, this.transform.forward),  t);
+
+          //  transform.position += velocity[i] * t;
+          //  BoidsTrs.Add(Instantiate(prefab, pos, rot).transform);
+
+            //  VelocitiesArray[i] = BoidsTrs[i].forward * maxVelocity;
+            // BoidsTrs[i].up = VelocitiesArray[i];
+
+            TransformTemp[i] =  goList[i].transform;  // for TransformAccessArray BoidsTrs[i];//
+
         }
-       
+        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+       // TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
+        VelocitiesArray.Dispose();
     }
 
 
@@ -80,21 +97,20 @@ public class BoidManager : MonoBehaviour {
         // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
         for (int i = 0; i < number; ++i) {
 
-         //   var obj = goList[i];  // ref to current gameobject 
+            //   var obj = goList[i];  // ref to current gameobject 
 
 
-          //     obj.transform.position = VelocitiesArray[i];
-           // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
+            //     obj.transform.position = VelocitiesArray[i];
+            // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
 
-            BoidsPositionArray[i] = BoidsTrs[i].position;
+            BoidsPositionArray[i] = goList[i].transform.position; // BoidsTrs[i].position;
 
-            VelocitiesArray[i] = BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
+            VelocitiesArray[i] = goList[i].transform.forward;// BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
 
 
          //   BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
         }
-        TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
 
         //  TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
@@ -309,11 +325,13 @@ public class BoidManager : MonoBehaviour {
         // trash can
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
-        TransformAccessArray.Dispose();
 
     }
 
+    public void OnDestroy() {
 
+        TransformAccessArray.Dispose();
+    }
 
 
 }

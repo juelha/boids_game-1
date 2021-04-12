@@ -25,9 +25,11 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
         var avoidanceVector = Vector3.zero;
         var found = 0;
         var rotationSpeed = 2;
+        var posOld = Vector3.zero;
+        var posNew = Vector3.zero;
+        var trsOld = Quaternion.identity;
 
-       
-     //   Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
+        //   Debug.DrawRay(transform.position, velocity[i] * 2, Color.yellow);  // surprisingly this works but the other stuff doesnt
 
         // at this point we know if boid is about to hit sth 
         if (isHitObstacles[i]) {  // if the ray cast from a boid hits sth -> avoid
@@ -56,7 +58,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
             //t = 20;
             velocity[i] += reflectedVector;
-            velocity[i] *= 20;
+           // velocity[i] *= 20;
             // velocity[i] = test;
 
 
@@ -73,10 +75,18 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             velocity[i] = velocity[i].normalized * 5;
         }
         dir = velocity[i];
-      //  transform.rotation = Quaternion.LookRotation(transform.position, dir);
-        transform.rotation = Quaternion.FromToRotation(transform.position, dir);
-        //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(avoidanceVector), rotationSpeed * t);
-        transform.position += velocity[i]*t;
+        //transform.rotation = Quaternion.
+        //  
+
+        posOld = transform.position;
+        trsOld = transform.rotation;
+      //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
+
+        transform.position += velocity[i] * t;
+        posNew = transform.position;
+        transform.rotation = Quaternion.Slerp(trsOld, Quaternion.FromToRotation(posOld, posNew), rotationSpeed * t);
+
+        // transform.rotation = Quaternion.FromToRotation(transform.position, dir);
         /*
         if (found > 0) {
             avoidanceVector /= found;  // normalizing
