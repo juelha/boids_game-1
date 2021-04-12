@@ -8,14 +8,14 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
 
     public NativeArray<Vector3> velocity;
     [ReadOnly] public NativeArray<bool> isHitObstacles;
-    [ReadOnly] public NativeArray<Vector3> hitNormals;
+    public NativeArray<Vector3> hitNormals;
     public float t;
 
 
     public void Execute(int i, TransformAccess transform) {
 
         // in case of disaster change these:
-        float weight = 1f;// 0.6f;
+        float weight = 7f;// 0.6f;
 
     //   /// Vector3[] reflectedVector;
     //    Vector3[] oppositeVel;
@@ -56,9 +56,10 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
             //  avoidanceVector *= weight;
 
             // spitzer angle
-            
-            velocity[i] = velocity[i] * (-7);
-            velocity[i] += reflectedVector;
+
+            //    velocity[i] = velocity[i] * (-7);
+            hitNormals[i] *= weight;
+            velocity[i] += hitNormals[i];
 
             //t = 20;
             // reflecter als ergebnis
