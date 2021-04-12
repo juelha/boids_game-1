@@ -1,0 +1,22 @@
+# boids_game
+
+- Custom models with Blender: Big Rock in the middle, Big Rock with Arc, Pufferfish Enemy
+- Custom models with Paint3D: Anchor, Corals, Stone arc and Stone wall
+- Shark Movement + integrating pre-built animations into custom Player Scripts
+- Speed with "Space"
+- Enemy Patrol
+- Chestsystem, Healthsystem and Scoresystem
+- UI: Score, Time, Chest, Damage
+- Highscore list with entering your name
+- Camera Switch with "G, F and R"
+- Main Menu with "How To Play" explanation, GameOver Screen and the game can be restarted
+- Boid simulation
+    - Flock behavior
+    - used filter and context spheres for better performance
+    - Obstacle and Player interaction
+    - Special fish (extra points)
+    - researched different ways to optimise the performance further but ran out of time, including but not limited to:
+        - using JOBS for multi threaded code (jobified boid behavior in branch: `boids_jobified` are 500 boids with 80 to 100FPS, couldnt include in game due to collision errors),
+        - CPU instancing (dealing with materials and texture atlas),
+        - Tiling and Cluster algorithms (DBSCAN)
+- Sounds (integration of freely usable sound files)
