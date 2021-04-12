@@ -27,9 +27,10 @@ public struct BoidStayJob : IJobParallelForTransform {
         Vector3 centerOffset = center - (Vector3)transform.position;
         float t = centerOffset.magnitude / radius;
         if (t > 0.9f) {
-            stayVec = centerOffset * t * t;
+            stayVec = centerOffset;// * t * t;
         }
 
+        /*
         if (transform.position.y < -25f) {
             stayVec = centerOffset * t;
         }
@@ -37,9 +38,11 @@ public struct BoidStayJob : IJobParallelForTransform {
         if (transform.position.y > 3f) {
             stayVec = centerOffset * t;
         }
+        */
 
-        stayVec = Vector3.zero;
+        // stayVec = Vector3.zero;
 
+        stayVec *= weight;
         velocity[i] += stayVec;
 
     }

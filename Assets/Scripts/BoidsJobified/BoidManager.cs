@@ -205,7 +205,7 @@ public class BoidManager : MonoBehaviour {
 
         // Schedule the batch of raycasts
         JobHandle handle;
-        var setupDependency = RaycastCommandJobs.Schedule(number, 32, SeparateJobHandle);
+        var setupDependency = RaycastCommandJobs.Schedule(number, 32, StayJobHandle);
         handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
 
         handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
