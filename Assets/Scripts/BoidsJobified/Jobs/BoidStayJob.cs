@@ -13,7 +13,7 @@ public struct BoidStayJob : IJobParallelForTransform {
 
         // in case of disaster change these:
         float radius = 15f;
-        float weight = 0.05f;
+        float weight = 0.7f;
 
         var center = Vector3.zero;
         var stayVec = Vector3.zero;

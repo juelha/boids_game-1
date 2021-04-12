@@ -15,7 +15,7 @@ public struct BoidAvoidObjJob : IJobParallelForTransform {
     public void Execute(int i, TransformAccess transform) {
 
         // in case of disaster change these:
-        int weight = 12;
+        float weight = 0.6f;
 
     //   /// Vector3[] reflectedVector;
     //    Vector3[] oppositeVel;
