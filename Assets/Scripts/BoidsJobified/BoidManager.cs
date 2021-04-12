@@ -12,7 +12,7 @@ public class BoidManager : MonoBehaviour {
     public List<GameObject> goList;
     public GameObject prefab;
 
-    private List<Transform> BoidsTrs = new List<Transform>();
+    private List<Transform> BoidsTrs;//= new List<Transform>();
 
     // STUFF TO CHANGE IN EDITOR  
     public float StartRadius;
@@ -30,7 +30,7 @@ public class BoidManager : MonoBehaviour {
     NativeArray<Vector3> VelocitiesArray; // we need to be able to write to it in the jobs
 
     // RAYCAST STUFF
-    public float raycastDistance = 0.04f;
+    [ReadOnly] public float raycastDistance = 0.0000001f;
 
 
     // JOBS 
@@ -57,27 +57,52 @@ public class BoidManager : MonoBehaviour {
     void Start() {
 
         VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+     //   BoidsTrs = new List<Transform>();
+
+        Transform[] TransformTemp = new Transform[number];
         // INIT 
         for (int i = 0; i < number; ++i) {
 
-           goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
+         //  goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
             Vector3 pos = this.transform.position+ Random.insideUnitSphere * StartRadius * AgentDensity;
             //  BoidsTrs.Add(Instantiate(prefab, pos, Random.rotation).transform);
-           Quaternion rot = Random.rotation;
-            // Quaternion rot = Quaternion.identity;
+          // Quaternion rot = Random.rotation;
+             Quaternion rot = Quaternion.identity;
             // Quaternion rot = Quaternion.FromToRotation(this.transform.position, this.transform.forward);
-
+            rot = Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f));
            // Quaternion rot = Quaternion.Slerp(this.transform.rotation, Quaternion.FromToRotation(this.transform.position, this.transform.forward),  t);
 
-          //  transform.position += velocity[i] * t;
-          //  BoidsTrs.Add(Instantiate(prefab, pos, rot).transform);
+                /*
+            //  transform.position += velocity[i] * t;
+            goList.Add(Instantiate(
+                prefab, 
+                pos, 
+                rot)
+                .transform);
 
-            //  VelocitiesArray[i] = BoidsTrs[i].forward * maxVelocity;
-            // BoidsTrs[i].up = VelocitiesArray[i];
+            */
 
+            goList.Add(Instantiate(
+                prefab,
+                //insideUnitSphere returns random point within a sphere of radius 1, used for setting starting point
+                // AgentDensity determines how far they start away from each other
+              //  Random.insideUnitSphere * number * AgentDensity,
+              pos,
+                //setting a random rotation
+                Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f)),
+                transform ));
+
+
+            VelocitiesArray[i] = goList[i].transform.forward * maxVelocity;
+            goList[i].transform.up += VelocitiesArray[i];
+       //     BoidsTrs[i] = goList[i].transform;
+
+
+              TransformTemp[i] = goList[i].transform; 
 
         }
        // TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
+        TransformAccessArray = new TransformAccessArray(TransformTemp);
         VelocitiesArray.Dispose();
     }
 
@@ -99,30 +124,38 @@ public class BoidManager : MonoBehaviour {
 
             //   var obj = goList[i];  // ref to current gameobject 
 
-
-            TransformTemp[i] = goList[i].transform;  // for TransformAccessArray BoidsTrs[i];//
-            //     obj.transform.position = VelocitiesArray[i];
-            // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
-
-            BoidsPositionArray[i] = goList[i].transform.position; // BoidsTrs[i].position;
-
-            VelocitiesArray[i] = goList[i].transform.forward;// BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
+           // BoidsPositionArray[i] = BoidsTrs[i].position;
+           // VelocitiesArray[i] = BoidsTrs[i].forward;// - BoidsTrs[i].position;
 
 
-         //   BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+            BoidsPositionArray[i] = goList[i].transform.position;
+            VelocitiesArray[i] = goList[i].transform.forward;// - BoidsTrs[i].position;
+           
+
+
+ // for TransformAccessArray BoidsTrs[i];//
+ //     obj.transform.position = VelocitiesArray[i];
+ // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
+
+            //   BoidsPositionArray[i] = goList[i].transform.position; // BoidsTrs[i].position;
+
+            //VelocitiesArray[i] = goList[i].transform.forward;// BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
+
+
+            //   BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
 
         }
 
-        //  TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+        //  // so far so good
 
 
-        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
+     //   TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
         // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
 
-        //          /*
+              /*
         AlignmentJob = new BoidAlignmentJob() {
         BoidsPositionArray = BoidsPositionArray,
         velocity = VelocitiesArray,
@@ -167,23 +200,23 @@ public class BoidManager : MonoBehaviour {
         StayJobHandle.Complete();
 
 
-        // */
+         */
         // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
         // RAYCAST START---------------------------------------------------------------------------------------------------------------------------------------
         NativeArray<bool> isHitObj = new NativeArray<bool>(number, Allocator.TempJob);
-        NativeArray<bool> isHitPlayer = new NativeArray<bool>(number, Allocator.TempJob);
+   //     NativeArray<bool> isHitPlayer = new NativeArray<bool>(number, Allocator.TempJob);
         NativeArray<Vector3> hitNormals = new NativeArray<Vector3>(number, Allocator.TempJob);
-        NativeArray<Vector3> hitNormalsPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
+    //    NativeArray<Vector3> hitNormalsPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
 
 
         // raycast data containers
         //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
         NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
-        NativeArray<RaycastCommand> raycastCommandsArrayPlayer = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+    //    NativeArray<RaycastCommand> raycastCommandsArrayPlayer = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
         NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
-        NativeArray<RaycastHit> raycastHitsArrayPlayer = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+     //   NativeArray<RaycastHit> raycastHitsArrayPlayer = new NativeArray<RaycastHit>(number, Allocator.TempJob);
 
         // make job
         BoidRaycastCommandJobs RaycastCommandJobs;
@@ -229,6 +262,7 @@ public class BoidManager : MonoBehaviour {
 
 
         //----------------------------------------------
+        /*
         BoidRaycastCommandJobs RaycastCommandJobsPlayer;
         NativeArray<Vector3> newVelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
 
@@ -241,6 +275,7 @@ public class BoidManager : MonoBehaviour {
 
         }
 
+        
         RaycastCommandJobsPlayer = new BoidRaycastCommandJobs() {
             raycastDistance = raycastDistance,
             positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
@@ -274,26 +309,35 @@ public class BoidManager : MonoBehaviour {
             }
 
         }
+        
+        raycastCommandsArrayPlayer.Dispose();
+
+        raycastHitsArrayPlayer.Dispose();
+        */
+
 
         // trash can
         raycastCommandsArray.Dispose();
-        raycastCommandsArrayPlayer.Dispose();
+       
         raycastHitsArray.Dispose();
-        raycastHitsArrayPlayer.Dispose();
-        newVelocitiesArray.Dispose();
+     //   newVelocitiesArray.Dispose();
 
+     
         // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
         t = Time.deltaTime;
+       /*
         AvoidObjJob = new BoidAvoidObjJob() {
             isHitObstacles = isHitObj,
             hitNormals = hitNormals,
             velocity = VelocitiesArray,
             t = t,
         };
-        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray);
-        AvoidObjJobHandle.Complete();
 
+        */
+       // AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray);
+      //  AvoidObjJobHandle.Complete();
 
+        /*
         AvoidPlayerJob = new BoidAvoidPlayerJob() {
 
             radius = avoidPlayerRadius,
@@ -305,13 +349,13 @@ public class BoidManager : MonoBehaviour {
         AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
         AvoidPlayerJobHandle.Complete();
 
-
+        */
 
         //dispose raycast dc
         hitNormals.Dispose();
-        hitNormalsPlayer.Dispose();
+      //  hitNormalsPlayer.Dispose();
         isHitObj.Dispose();
-        isHitPlayer.Dispose();
+      //  isHitPlayer.Dispose();
 
 
         // UPDATE BOID-------------------------------------------------------------------------
@@ -328,14 +372,27 @@ public class BoidManager : MonoBehaviour {
             var posOld = Vector3.zero;
             var posNew = Vector3.zero;
             var trsOld = Quaternion.identity;
-            posOld = goList[i].transform.position;
-            trsOld = goList[i].transform.rotation;
+             posOld = goList[i].transform.position;
+            //  trsOld = BoidsTrs[i].rotation;
             //  transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(transform.position, dir), rotationSpeed * t);
 
-            goList[i].transform.up = VelocitiesArray[i];  // cannot jobify .up
-            goList[i].transform.position += VelocitiesArray[i] * t;
-            posNew = goList[i].transform.position;
-           // goList[i].transform.rotation = Quaternion.FromToRotation(posOld, posNew);
+
+            // BoidsTrs[i].rotation = Quaternion.FromToRotation(posOld, posOld+VelocitiesArray[i]);
+            //  BoidsTrs[i].up += posOld+ VelocitiesArray[i];
+            //  BoidsTrs[i].up = VelocitiesArray[i];  // cannot jobify .up
+            //    BoidsTrs[i].position += VelocitiesArray[i] * t;// * t;
+            //    posNew = BoidsTrs[i].position;
+
+            goList[i].transform.up = posOld + VelocitiesArray[i];
+
+            goList[i].transform.position += VelocitiesArray[i] * t;// * t;
+
+            
+          //  BoidsTrs[i].up = posNew- posOld;  // cannot jobify .up
+
+            //  goList[i].transform.position += goList[i].transform.forward * t;
+            //    posNew = BoidsTrs[i].position;
+            //  BoidsTrs[i].rotation = Quaternion.FromToRotation(posOld, VelocitiesArray[i] * t);
             /*
             var obj = goList[i];  // ref to current gameobject 
             obj.transform.up = VelocitiesArray[i]; // for TransformAccessArray
@@ -351,11 +408,11 @@ public class BoidManager : MonoBehaviour {
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
 
-        TransformAccessArray.Dispose();
+       // TransformAccessArray.Dispose();
     }
 
     public void OnDestroy() {
-
+        TransformAccessArray.Dispose();
     }
 
 

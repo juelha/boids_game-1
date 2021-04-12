@@ -12,10 +12,11 @@ struct BoidRaycastCommandJobs : IJobParallelFor {
     // public NativeArray<SpherecastCommand> Raycasts;
     public NativeArray<RaycastCommand> Raycasts;
 
+
     public void Execute(int i) {
         //  Raycasts[i] = new SpherecastCommand(positions[i], raycastDistance, velocities[i]);
         Raycasts[i] = new RaycastCommand(positions[i], velocities[i], raycastDistance);//, layerMask);
-      //  Debug.DrawRay(positions[i], velocities[i] * raycastDistance, Color.yellow);  // works!!!
+       Debug.DrawRay(positions[i], velocities[i] * raycastDistance, Color.yellow);  // works!!!
 
     }
 }
