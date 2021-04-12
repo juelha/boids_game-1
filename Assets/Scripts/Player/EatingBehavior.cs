@@ -71,7 +71,7 @@ public class EatingBehavior : MonoBehaviour
         this.DisplaySpeedUI();
 
         // this.ShrinkShark();
-
+        /*
         if (Input.GetKeyDown(KeyCode.P) || Input.GetButton("Cancel")) // "Cancel" means Escape key
         {
             GameState.Transition(GameState.Event.TogglePause);
@@ -80,7 +80,7 @@ public class EatingBehavior : MonoBehaviour
         if (this.IsGameOver())
         {
             GameState.Transition(GameState.Event.FinishGame);
-        }
+        }*/
     }
 
     private void UpdateGameTime()
@@ -214,7 +214,7 @@ public class EatingBehavior : MonoBehaviour
             }
 
             PlayEatingSound();
-            AddScore(1);
+            AddScore(5);
             //Destroy
             DestroyBoidAfter(destroyBoidAfter, col);
 
@@ -231,7 +231,7 @@ public class EatingBehavior : MonoBehaviour
             }
 
             PlayEatingSound();
-            AddScore(5);
+            AddScore(20);
             //Destroy
             DestroyBoidAfter(destroyBoidAfter, col);
         }
@@ -244,11 +244,12 @@ public class EatingBehavior : MonoBehaviour
                 transform.localScale = new Vector3(maxSize, maxSize, transform.localScale.z);
             }
 
-            this.score += 1;
+        
             gametime += 10f;
-
+            PlayEatingSound();
+            AddScore(10);
             //Destroy
-            DestroyBoidAfter(5f, col);
+            DestroyBoidAfter(destroyBoidAfter, col);
         }
     }
 

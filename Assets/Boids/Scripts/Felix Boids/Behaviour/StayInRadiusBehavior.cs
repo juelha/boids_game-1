@@ -22,7 +22,7 @@ public class StayInRadiusBehavior : FlockBehavior
             return centerOffset * t;
         }
 
-        if (agent.transform.position.y > 3f)
+        if (agent.transform.position.y > -3f)
         {
             return centerOffset * t;
         }
