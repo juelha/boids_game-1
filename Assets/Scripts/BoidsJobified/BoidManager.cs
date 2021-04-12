@@ -378,8 +378,8 @@ public class BoidManager : MonoBehaviour {
             rotOld = goList[i].transform.rotation;
             //  trsOld = BoidsTrs[i].rotation;
             var dir = Vector3.zero;
-          //  dir = VelocitiesArray[i];
-            dir = VelocitiesArray[i] + posOld;
+            //  dir = VelocitiesArray[i];
+            dir = VelocitiesArray[i];// + posOld;
             goList[i].transform.rotation = Quaternion.Slerp(rotOld, Quaternion.FromToRotation(posOld, dir), t);
             goList[i].transform.position += goList[i].transform.forward * t;
 

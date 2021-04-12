@@ -13,7 +13,7 @@ public struct BoidSeparateJob : IJobParallelForTransform {
 
         // in case of disaster change these:
         int radius = 5;
-        float weight = 1.3f;
+        float weight = 0.5f;// 1.3f;
 
         var average_sep = Vector3.zero;
         var found = 0;
