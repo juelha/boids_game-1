@@ -4,87 +4,197 @@ using Unity.Jobs;
 using Unity.Collections;
 using UnityEngine.Jobs;
 
-
 public class BoidManager : MonoBehaviour {
 
 
-    public List<GameObject> boids;
 
-
+    // GAMEOBJECT STUFF HERE
+    public List<GameObject> goList;
     public GameObject prefab;
 
-    public float radius;
+    private List<Transform> BoidsTrs;//= new List<Transform>();
+
+    // STUFF TO CHANGE IN EDITOR  
+    public float StartRadius;
+
+    public float avoidPlayerRadius;
+
     public int number;
+    public float t;
     public float maxVelocity;
+    public float AgentDensity;
 
-    //
-    //NativeArray<Transform> Velocities;
-    TransformAccessArray TransformAccessArray;
-  //  TransformAccessArray BoidsTransformArray;  // to iterate over boids (nested for loop)
-   // NativeArray<Transform> BoidsPositionArray;
+    // DATA CONTAINERS
+    public TransformAccessArray TransformAccessArray;
     [ReadOnly] public NativeArray<Vector3> BoidsPositionArray;
+    NativeArray<Vector3> VelocitiesArray; // we need to be able to write to it in the jobs
 
-    NativeArray<Vector3> VelocitiesArray; // saving vel here not in Boid.cs
+    // RAYCAST STUFF
+    [ReadOnly] public float raycastDistance = 1f;
 
-    // DO NOT TOUCH
-    // private Transform[] TransformTemp;// = new Transform[100];
 
-    public BoidUpdateJob UpdateJob;
+    // JOBS 
     public BoidAlignmentJob AlignmentJob;
     public BoidCohesionJob CohesionJob;
+    public BoidSeparateJob SeparateJob;
+    public BoidStayJob StayJob;
 
-    JobHandle UpdateJobHandle;
+    public BoidAvoidPlayerJob AvoidPlayerJob;
+    public BoidAvoidObjJob AvoidObjJob;
+
+
+    // JOBHANDLES
     JobHandle AlignmentJobHandle;
     JobHandle CohesionJobHandle;
+    JobHandle SeparateJobHandle;
+    JobHandle StayJobHandle;
+
+    JobHandle AvoidPlayerJobHandle;
+    JobHandle AvoidObjJobHandle;
+
 
 
     void Start() {
-        Transform[] TransformTemp = new Transform[number];
-       // NativeArray<Vector3> BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
-       // NativeArray<Vector3> VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
-        BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.Persistent);
-        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.Persistent);
 
+        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+        //   BoidsTrs = new List<Transform>();
+
+        Transform[] TransformTemp = new Transform[number];
+        // INIT 
         for (int i = 0; i < number; ++i) {
 
-            boids.Add(Instantiate(prefab, Random.insideUnitSphere * radius, Random.rotation));
-         
-            var obj = boids[i];
-            TransformTemp[i] = obj.transform;
-            BoidsPositionArray[i] = obj.transform.position;
-            VelocitiesArray[i] = obj.transform.forward * maxVelocity; // change start velocity HERE
-        }
+            //  goList.Add(Instantiate(prefab, Random.insideUnitSphere * StartRadius * AgentDensity, Random.rotation));
+            Vector3 pos = this.transform.position + Random.insideUnitSphere * StartRadius * AgentDensity;
+            //  BoidsTrs.Add(Instantiate(prefab, pos, Random.rotation).transform);
+            // Quaternion rot = Random.rotation;
+            Quaternion rot = Quaternion.identity;
+            // Quaternion rot = Quaternion.FromToRotation(this.transform.position, this.transform.forward);
+            rot = Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f));
+            // Quaternion rot = Quaternion.Slerp(this.transform.rotation, Quaternion.FromToRotation(this.transform.position, this.transform.forward),  t);
 
-        TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
-        //BoidsTransformArray = new TransformAccessArray(TransformTemp); // same array twice? 
+            /*
+        //  transform.position += velocity[i] * t;
+        goList.Add(Instantiate(
+            prefab, 
+            pos, 
+            rot)
+            .transform);
+        */
+
+            goList.Add(Instantiate(
+                prefab,
+              //insideUnitSphere returns random point within a sphere of radius 1, used for setting starting point
+              // AgentDensity determines how far they start away from each other
+              //  Random.insideUnitSphere * number * AgentDensity,
+              pos,
+                //setting a random rotation
+                Quaternion.Euler(Vector3.forward * Random.Range(0f, 360f))
+                )
+                );//; ;// ;transform));
+
+
+            //  VelocitiesArray[i] = goList[i].transform.forward * maxVelocity;
+            // goList[i].transform.up = VelocitiesArray[i];
+
+            //     BoidsTrs[i] = goList[i].transform;
+
+
+            var obj = goList[i];
+
+
+            TransformTemp[i] = obj.transform;
+
+            VelocitiesArray[i] = obj.transform.forward * maxVelocity;
+            obj.transform.up = VelocitiesArray[i];
+
+
+            goList[i] = obj;
+
+        }
+        // TransformAccessArray = new TransformAccessArray(BoidsTrs.ToArray());
+        TransformAccessArray = new TransformAccessArray(TransformTemp);
+        VelocitiesArray.Dispose();
     }
 
-   
+
     private void Update() {
+
+        // DATA CONTAINERS
+
+        // init arrays
+        //    Transform[] TransformTemp = new Transform[number];
+        BoidsPositionArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+        VelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+
+
+        Transform[] TransformTemp = new Transform[number];
+
+        // INIT ---------------------------------------------------------------------------------------------------------------------------------------------------
+        for (int i = 0; i < number; ++i) {
+
+            var obj = goList[i];  // ref to current gameobject 
+
+            // BoidsPositionArray[i] = BoidsTrs[i].position;
+            // VelocitiesArray[i] = BoidsTrs[i].forward;// - BoidsTrs[i].position;
+
+
+            //  BoidsPositionArray[i] = goList[i].transform.position;
+            //   VelocitiesArray[i] = goList[i].transform.forward;// - BoidsTrs[i].position;
+
+
+            BoidsPositionArray[i] = obj.transform.position;
+            VelocitiesArray[i] = obj.transform.forward;// - BoidsTrs[i].position;
+
+            // for TransformAccessArray BoidsTrs[i];//
+            //     obj.transform.position = VelocitiesArray[i];
+            // TransformTemp[i] = goList[i].transform;  // for TransformAccessArray
+
+            //   BoidsPositionArray[i] = goList[i].transform.position; // BoidsTrs[i].position;
+
+            //VelocitiesArray[i] = goList[i].transform.forward;// BoidsTrs[i].forward;// * maxVelocity; // change start velocity HERE
+
+
+            //   BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+
+        }
+
+        //  // so far so good
+
+
+        //   TransformAccessArray = new TransformAccessArray(TransformTemp);  // so far so good
 
         // create list of jobhandles and use complete all (see vid code monkey 9min) 
 
-        // new job-----------------------------------------------------------
+        // START JOBS-------------------------------------------------------------------------------------------------------------------------------------------
+
+        //  /*
         AlignmentJob = new BoidAlignmentJob() {
-            deltaTime = Time.deltaTime,
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
 
         CohesionJob = new BoidCohesionJob() {
-            deltaTime = Time.deltaTime,
             BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
 
-        UpdateJob = new BoidUpdateJob() {  // LAST
-            deltaTime = Time.deltaTime,
+        SeparateJob = new BoidSeparateJob() {
+            BoidsPositionArray = BoidsPositionArray,
             velocity = VelocitiesArray,
         };
 
+        StayJob = new BoidStayJob() {
+            BoidsPositionArray = BoidsPositionArray,
+            velocity = VelocitiesArray,
+        };
+
+
         // Schedule--------------------------------------------------------
         AlignmentJobHandle = AlignmentJob.Schedule(TransformAccessArray);
-        CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);     // ????
+        CohesionJobHandle = CohesionJob.Schedule(TransformAccessArray, AlignmentJobHandle);
+        SeparateJobHandle = CohesionJob.Schedule(TransformAccessArray, CohesionJobHandle);
+        StayJobHandle = StayJob.Schedule(TransformAccessArray, SeparateJobHandle);
+
 
 
 
@@ -94,22 +204,229 @@ public class BoidManager : MonoBehaviour {
 
         // Populate `handles` with `JobHandles` from multiple scheduled jobs...
 
-        //   JobHandle jh = JobHandle.CombineDependencies(handles);
-
-        UpdateJobHandle = UpdateJob.Schedule(TransformAccessArray, CohesionJobHandle);
 
         // Complete--------------------------------------------------------
         AlignmentJobHandle.Complete();
         CohesionJobHandle.Complete();
+        SeparateJobHandle.Complete();
+        StayJobHandle.Complete();
 
-        UpdateJobHandle.Complete();
-    }
 
-     private void OnDestroy() {
-    //private void OnDisable() {
+        //  */
+        // END JOBS---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        // RAYCAST START---------------------------------------------------------------------------------------------------------------------------------------
+        NativeArray<bool> isHitObj = new NativeArray<bool>(number, Allocator.TempJob);
+        //     NativeArray<bool> isHitPlayer = new NativeArray<bool>(number, Allocator.TempJob);
+        NativeArray<Vector3> hitNormals = new NativeArray<Vector3>(number, Allocator.TempJob);
+        //    NativeArray<Vector3> hitNormalsPlayer = new NativeArray<Vector3>(number, Allocator.TempJob);
+
+
+        // raycast data containers
+        //  NativeArray < SpherecastCommand > raycastCommandsArray = new NativeArray<SpherecastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastCommand> raycastCommandsArray = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        //    NativeArray<RaycastCommand> raycastCommandsArrayPlayer = new NativeArray<RaycastCommand>(number, Allocator.TempJob);
+        NativeArray<RaycastHit> raycastHitsArray = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+        //   NativeArray<RaycastHit> raycastHitsArrayPlayer = new NativeArray<RaycastHit>(number, Allocator.TempJob);
+
+        // make job
+        BoidRaycastCommandJobs RaycastCommandJobs;
+
+
+        for (int i = 0; i < number; i++) {
+            // raycast commands array init -> per boid one command 
+            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
+            raycastCommandsArray[i] = new RaycastCommand(BoidsPositionArray[i], VelocitiesArray[i], raycastDistance);
+
+        }
+
+        RaycastCommandJobs = new BoidRaycastCommandJobs() {
+            raycastDistance = raycastDistance,
+            positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
+            velocities = VelocitiesArray,
+            Raycasts = raycastCommandsArray,
+        };
+
+        // Schedule the batch of raycasts
+        JobHandle handle;
+        var setupDependency = RaycastCommandJobs.Schedule(number, 32, StayJobHandle);
+        handle = RaycastCommand.ScheduleBatch(raycastCommandsArray, raycastHitsArray, 32, setupDependency);
+
+        handle.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+
+        // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
+            // the collider that was hit 
+            RaycastHit hit;
+            hit = raycastHitsArray[i];
+
+            // about to hit Obj?
+            if (hit.collider) {
+                isHitObj[i] = true; // setting up isHitObj Array
+                hitNormals[i] = hit.normal;
+            }
+            else {
+                isHitObj[i] = false;
+            }
+
+        }
+
+
+        //----------------------------------------------
+        /*
+        BoidRaycastCommandJobs RaycastCommandJobsPlayer;
+        NativeArray<Vector3> newVelocitiesArray = new NativeArray<Vector3>(number, Allocator.TempJob);
+        for (int i = 0; i < number; i++) {
+            newVelocitiesArray[i] = -VelocitiesArray[i];
+            // raycast commands array init -> per boid one command 
+            // raycastCommandsArray[i] = new SpherecastCommand(BoidsPositionArray[i], raycastDistance, VelocitiesArray[i]);
+            raycastCommandsArrayPlayer[i] = new RaycastCommand(BoidsPositionArray[i], newVelocitiesArray[i], raycastDistance);
+        }
         
+        RaycastCommandJobsPlayer = new BoidRaycastCommandJobs() {
+            raycastDistance = raycastDistance,
+            positions = BoidsPositionArray, // cant use IJobParallelForTransform so we have to pass pos manually
+            velocities = newVelocitiesArray,
+            Raycasts = raycastCommandsArrayPlayer,
+        };
+        // Schedule the batch of raycasts
+        JobHandle handlePlayer;
+        var setupDependencyPlayer = RaycastCommandJobsPlayer.Schedule(number, 32, handle);
+        handlePlayer = RaycastCommand.ScheduleBatch(raycastCommandsArrayPlayer, raycastHitsArrayPlayer, 32, setupDependencyPlayer);
+        handlePlayer.Complete();  // "Since the results are written asynchronously the results buffer cannot be accessed until the job has been completed."
+        // IS BOID ABOUT TO HIT OBJ?--------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
+            // the collider that was hit 
+            RaycastHit hit;
+            hit = raycastHitsArrayPlayer[i];
+            // about to hit Player?
+           // if (hit.collider) {
+            if (1==2){//hit.collider.gameObject.tag == "shark") {
+                isHitPlayer[i] = true;
+                hitNormalsPlayer[i] = hit.normal;
+            }
+            else {
+                isHitPlayer[i] = false;
+            }
+        }
+        
+        raycastCommandsArrayPlayer.Dispose();
+        raycastHitsArrayPlayer.Dispose();
+        */
+
+
+        // trash can
+        raycastCommandsArray.Dispose();
+
+        raycastHitsArray.Dispose();
+        //   newVelocitiesArray.Dispose();
+
+
+        // RAYCAST END--------------------------------------------------------------------------------------------------------------------------------------------------------
+        t = Time.deltaTime;
+        //      /*
+        AvoidObjJob = new BoidAvoidObjJob() {
+            isHitObstacles = isHitObj,
+            hitNormals = hitNormals,
+            velocity = VelocitiesArray,
+            t = t,
+        };
+        AvoidObjJobHandle = AvoidObjJob.Schedule(TransformAccessArray);
+        AvoidObjJobHandle.Complete();
+
+        //      */
+
+
+        /*
+        AvoidPlayerJob = new BoidAvoidPlayerJob() {
+            radius = avoidPlayerRadius,
+            isHitObstacles = isHitPlayer,
+            hitNormals = hitNormalsPlayer,
+            velocity = VelocitiesArray,
+        };
+        AvoidPlayerJobHandle = AvoidPlayerJob.Schedule(TransformAccessArray, AvoidObjJobHandle);
+        AvoidPlayerJobHandle.Complete();
+        */
+
+        //dispose raycast dc
+        hitNormals.Dispose();
+        //  hitNormalsPlayer.Dispose();
+        isHitObj.Dispose();
+        //  isHitPlayer.Dispose();
+
+
+        // UPDATE BOID-------------------------------------------------------------------------
+        for (int i = 0; i < number; i++) {
+
+
+            if (VelocitiesArray[i].magnitude > maxVelocity) {
+                VelocitiesArray[i] = VelocitiesArray[i].normalized * maxVelocity;
+            }
+            // dir = velocity[i];
+            //transform.rotation = Quaternion.
+            //  
+
+            var posOld = Vector3.zero;
+            var posNew = Vector3.zero;
+            var trsOld = Quaternion.identity;
+            var rotOld = Quaternion.identity;
+            // posOld = goList[i].transform.position;
+            //  rotOld = goList[i].transform.rotation;
+
+            var obj = goList[i];
+            posOld = obj.transform.position;
+            rotOld = obj.transform.rotation;
+
+            //  trsOld = BoidsTrs[i].rotation;
+            var dir = Vector3.zero;
+            //  dir = VelocitiesArray[i];
+            dir = VelocitiesArray[i];// + posOld;
+            obj.transform.up = VelocitiesArray[i];  // goList[i].transform.rotation 
+            obj.transform.rotation = Quaternion.Slerp(rotOld, Quaternion.FromToRotation(posOld, dir), t);
+            obj.transform.position += obj.transform.forward * t;
+
+
+            goList[i] = obj;
+
+            //   goList[i].transform.up = VelocitiesArray[i]; // posOld +
+            // BoidsTrs[i].rotation = Quaternion.FromToRotation(posOld, posOld+VelocitiesArray[i]);
+            //  BoidsTrs[i].up += posOld+ VelocitiesArray[i];
+            //  BoidsTrs[i].up = VelocitiesArray[i];  // cannot jobify .up
+            //    BoidsTrs[i].position += VelocitiesArray[i] * t;// * t;
+            //    posNew = BoidsTrs[i].position;
+
+            //  goList[i].transform.up = posOld + VelocitiesArray[i];
+
+            //  goList[i].transform.position += VelocitiesArray[i] * t;// * t;
+
+
+            //  BoidsTrs[i].up = posNew- posOld;  // cannot jobify .up
+
+            //  goList[i].transform.position += goList[i].transform.forward * t;
+            //    posNew = BoidsTrs[i].position;
+            //  BoidsTrs[i].rotation = Quaternion.FromToRotation(posOld, VelocitiesArray[i] * t);
+            /*
+            var obj = goList[i];  // ref to current gameobject 
+            obj.transform.up = VelocitiesArray[i]; // for TransformAccessArray
+                                                   // obj.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(VelocitiesArray[i]), Time.deltaTime);
+            obj.transform.position += VelocitiesArray[i] * Time.deltaTime;
+            
+        BoidsTrs[i].up = VelocitiesArray[i];  // upward part of capsule points in direction of movement
+            goList[i] = obj; 
+            */
+        }
+
+        // trash can
         BoidsPositionArray.Dispose();
         VelocitiesArray.Dispose();
+
+        // TransformAccessArray.Dispose();
+    }
+
+    public void OnDestroy() {
         TransformAccessArray.Dispose();
     }
+
+
 }
